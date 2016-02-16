@@ -65,6 +65,13 @@ let third = matrices.create(1,2,[0,1]);
 first.add(third); // undefined
 ```
 
+It turned out to be useful to get a single row or column from a matrix, so you can
+do that too using `mat.row(N)` and `mat.col(N)`:
+```javascript
+first.row(0); // matrix(2,1,[1,2])
+first.col(1); // matrix(2,1,[2,4])
+```
+
 Vectors
 -------
 Note: vectors aren't done yet.
@@ -142,14 +149,6 @@ color.bgr; // vec3(64,128,255)
 Notes & Development
 ===================
 
-Performance
------------
-I have not yet performance tuned these, but they're sanely written and should be fast
-enough for typical usage. Some overhead is always created by using Babel to polyfill
-ES6 functionality, which I use pretty extensively here. That should solve itself over
-time, but if there are any serious performance hitches please report them as bugs with
-a test case and I'll see what I can do about it.
-
 Install
 -------
 ```bash
@@ -170,6 +169,38 @@ npm install --only=dev .
 gulp test
 gulp test:coverage
 ```
+
+Requests & Contributions
+------------------------
+I'm relatively new to matrix math and libraries for doing it. As such I don't know
+exactly what is and isn't useful or expected. I'm happy to accept feature requests,
+bug reports, and better yet pull requests for new features or fixes. The only thing
+I ask is that pull requets are unit tested with good coverage (for which mocha and
+istanbul are included in the dev dependencies and gulp file).
+
+Roadmap
+-------
+I'll be continuing work on this for the forseeable future, adding features as I need
+them for other projects (mostly concerning WebGL). I do have a few things slated for
+the immediate future including some predefined matrices that I've already written and
+only need to port (mat2, mat3, mat4, identity, vector projection, vector rotation), and
+finishing up basic vector ops (dot, cross, etc, casting vectors to other vector types).
+
+I also need to provide methods for matrix row operations and for producing column-major
+rows for pushing to GLSL uniforms. Those will probably happen pretty soon.
+
+The one thing I don't plan to solve any time soon is matrix inversion, because I need
+to understand it better, select an appropriate algorith, and figure out how to implement
+it in javascript. If you know how to do it and would like to contribute a reasonably
+fast solution, please do!
+
+Performance
+-----------
+I have not yet performance tuned these, but they're sanely written and should be fast
+enough for typical usage. Some overhead is always created by using Babel to polyfill
+ES6 functionality, which I use pretty extensively here. That should solve itself over
+time, but if there are any serious performance hitches please report them as bugs with
+a test case and I'll see what I can do about it.
 
 License
 -------
