@@ -5,70 +5,46 @@
 	 */
 
 	/**
-	 * Do an operation on any number of matrices.
-	 * @param matrices
-	 * @param check callback(a,b) function that checks whether a and b are compatible for this op, must return true or false
-	 * @param cb callback(a,b) function for the operation, returns a new matrix
+	 * Add two matrices together.
 	 */
-	function op(matrices, check, cb) {
-		matrices = [].slice.apply(matrices); // convert args to array
-		let a = matrices.shift();
-		if(a === undefined || matrices.length === 0) return a;
-		let b = op(matrices, check, cb);
-		if(b === undefined) return undefined;
-		if(!check(a, b)) return undefined;
-		return cb(a, b);
+	function add(a, b) {
+		if(typeof(b) === "number") return create(a.rows,a.cols, a.map((cur) => cur + b));
+		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
+			return create(a.rows, a.cols, a.map((cur, i) => cur + b[i]))
+		}
+		else return undefined;
 	}
 
 	/**
-	 * Add multiple matrices together.
+	 * Subtract matrices. Subtraction isn't commutative so you can't do multiple subtracts.
 	 */
-	function add() {
-		return op(arguments, 
-			(a, b) => a !== undefined && ((typeof(b) === "number") || ((a.cols === b.cols) && (a.rows === b.rows))),
-			(a, b) => {
-				if(typeof(b) === "number") b = create(a.rows,a.cols).fill(b);
-				return create(a.rows, a.cols, a.map((cur, i) => cur + b[i]))
-			}
-		);
-	}
-
-	/**
-	 * Subtract multiple matrices.
-	 */
-	function sub() {
-		return op(arguments, 
-			(a, b) => a !== undefined && ((typeof(b) === "number") || ((a.cols === b.cols) && (a.rows === b.rows))),
-			(a, b) => {
-				if(typeof(b) === "number") b = create(a.rows,a.cols).fill(b);
-				return create(a.rows, a.cols, a.map((cur, i) => cur - b[i]))
-			}
-		);
+	function sub(a, b) {
+		if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur - b));
+		else if((a.rows === b.rows) && (a.cols === b.cols)) return create(a.rows, a.cols, a.map((cur, i) => cur - b[i]));
+		else return undefined;
 	}
 
 	/**
 	 * Multiply multiple matrices.
 	 */
-	function dot() {
-		return op(arguments,
-			(a, b) => typeof(b) === "number" || a.cols === b.rows,
-			(a, b) => {
-				if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur*b));
-				let out = [];
-				for(let i = 0; i < a.rows; i++) {
-					let row = a.row(i);
-					for(let n = 0; n < b.cols; n++) {
-						let col = b.col(n);
-						let sum = 0;
-						for(let m = 0; m < col.length; m++) {
-							sum += col[m]*row[m];	
-						}
-						out.push(sum);
+	function dot(a, b) {
+		if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur*b));
+		else if(a.cols === b.rows) {
+			let out = [];
+			for(let i = 0; i < a.rows; i++) {
+				let row = a.row(i);
+				for(let n = 0; n < b.cols; n++) {
+					let col = b.col(n);
+					let sum = 0;
+					for(let m = 0; m < col.length; m++) {
+						sum += col[m]*row[m];	
 					}
+					out.push(sum);
 				}
-				return create(a.rows, b.cols, out);
 			}
-		);
+			return create(a.rows, b.cols, out);
+		}
+		else return undefined;
 	}
 
 	function col(mat, n) {

@@ -43,8 +43,6 @@ describe("an arbitrary matrix", function() {
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let out = mat1.add(mat2);
 		out.toArray().should.eql([3,3,3,3]);
-		out = mat1.add(mat2,out);
-		out.toArray().should.eql([6,6,6,6]);
 	});
 	it("should add scalars to matrices", function() {
 		let mat1 = matrices.create(3,3).fill(4);
@@ -55,11 +53,9 @@ describe("an arbitrary matrix", function() {
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
 		let out1 = mat1.add(mat2);
-		let out2 = mat1.add(mat2,out1);
 		mat1.toArray().should.eql([1,1,1,1]);
 		mat2.toArray().should.eql([2,2,2,2]);
 		out1.toArray().should.eql([3,3,3,3]);
-		out2.toArray().should.eql([6,6,6,6]);
 		mat1.add(mat3).toArray().should.eql([2,3,4,5]);
 		let scalar = 2;
 		mat1.add(scalar);
@@ -71,8 +67,6 @@ describe("an arbitrary matrix", function() {
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
 		let out = mat1.sub(mat2);
 		out.toArray().should.eql([-1,-1,-1,-1]);
-		out = mat1.sub(mat2,out);
-		out.toArray().should.eql([-2,-2,-2,-2]);
 		mat3.sub(mat1).toArray().should.eql([0,1,2,3]);
 	});
 	it("should subtract scalars from matrices", function() {
@@ -83,7 +77,7 @@ describe("an arbitrary matrix", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let out1 = mat1.sub(mat2);
-		let out2 = mat1.sub(mat2,out1);
+		let out2 = out1.sub(mat1);
 		mat1.toArray().should.eql([1,1,1,1]);
 		mat2.toArray().should.eql([2,2,2,2]);
 		out1.toArray().should.eql([-1,-1,-1,-1]);
@@ -98,14 +92,8 @@ describe("an arbitrary matrix", function() {
 		let mat3 = matrices.create(1,4,[1,1,1,1]);
 		(mat1.add(mat2) === undefined).should.eql(true);
 		(mat1.add(mat3) === undefined).should.eql(true);
-		(mat1.add(mat1,mat2) === undefined).should.eql(true);
-		(mat1.add(mat2,mat1) === undefined).should.eql(true);
-		(mat1.add(mat2,mat3) === undefined).should.eql(true);
 		(mat1.sub(mat2) === undefined).should.eql(true);
 		(mat1.sub(mat3) === undefined).should.eql(true);
-		(mat1.sub(mat1,mat2) === undefined).should.eql(true);
-		(mat1.sub(mat2,mat1) === undefined).should.eql(true);
-		(mat1.sub(mat2,mat3) === undefined).should.eql(true);
 	});
 	it("should multiply two compatible matrices", function() {
 		let mat1 = matrices.create(1,2,[0, 1]);
