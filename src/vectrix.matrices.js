@@ -98,7 +98,7 @@
 		var matrix = new Float32Array(cols * rows);	
 		matrix.cols = cols;
 		matrix.rows = rows;
-		if(values) matrix.set(values);
+		if(values.length > 0) matrix.set(values);
 		matrix.add = add.bind(null, matrix);
 		matrix.sub = sub.bind(null, matrix);
 		matrix.dot = dot.bind(null, matrix);

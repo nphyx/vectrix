@@ -13,8 +13,6 @@ describe("a 2d vector", function() {
 		let initial = [1,2];
 		let vec = vectors.vec2(initial);
 		vec.toArray().should.eql(initial);
-		vec.x.should.equal(1);
-		vec.y.should.equal(2);
 	});
 	it("should created a populated vector when given two arguments", function() {
 		let vec = vectors.vec2(3,4);
@@ -24,8 +22,10 @@ describe("a 2d vector", function() {
 		let vec = vectors.vec2([1,2]);
 		vec.x.should.equal(1);
 		vec.y.should.equal(2);
-		vec.xy.toArray().should.eql([1,2]);
-		vec.yx.toArray().should.eql([2,1]);
+		vec.x = 3;
+		vec.y = 4;
+		vec.xy.toArray().should.eql([3,4]);
+		vec.yx.toArray().should.eql([4,3]);
 		vectors.aliases2d.forEach((aliases) => {
 			aliases.names.forEach((name) => {
 				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);

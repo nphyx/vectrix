@@ -16,6 +16,11 @@ describe("an arbitrary matrix", function() {
 		let values = [0,1,2,3,4,5];
 		mat = matrices.create(2, 3, values);
 		[].slice.apply(mat).should.eql(values);
+
+		// check that case with no initial value is supported
+		mat = matrices.create(3,3);
+		mat.length.should.eql(9);
+		mat.forEach((val) => val.should.eql(0));
 	});
 	it("should be able to produce an array from itself", function() {
 		let mat = matrices.create(2,2,[0,1,2,3]);
