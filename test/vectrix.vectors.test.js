@@ -1,7 +1,7 @@
 "use strict";
 require("should");
-const vectors = require("../src/jsmatrix.vector.js");
-const matrices = require("../src/jsmatrix.matrix.js");
+const vectors = require("../src/vectrix.vectors.js");
+const matrices = require("../src/vectrix.matrices.js");
 describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
 		let vec = vectors.vec2();

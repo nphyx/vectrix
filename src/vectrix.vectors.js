@@ -2,7 +2,7 @@
 	/**
 	 * Treat vectors as column matrixes, makes this easy.
 	 */
-	const matrix = require("./jsmatrix.matrix.js");
+	const matrix = require("./vectrix.matrices.js");
 
 	/*
 	 * All of the below is a dumb, slow workaround for the fact
