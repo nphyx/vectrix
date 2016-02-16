@@ -1,6 +1,5 @@
 (function() {
 	"use strict";
-
 	/**
 	 * The generic matrix type, upon which other matrices are built.
 	 */
@@ -50,7 +49,7 @@
 	/**
 	 * Multiply multiple matrices.
 	 */
-	function mul() {
+	function dot() {
 		return op(arguments,
 			(a, b) => typeof(b) === "number" || a.cols === b.rows,
 			(a, b) => {
@@ -102,7 +101,7 @@
 		if(values) matrix.set(values);
 		matrix.add = add.bind(null, matrix);
 		matrix.sub = sub.bind(null, matrix);
-		matrix.mul = mul.bind(null, matrix);
+		matrix.dot = dot.bind(null, matrix);
 		matrix.col = col.bind(null, matrix);
 		matrix.row = row.bind(null, matrix);
 		matrix.toArray = toArray.bind(null, matrix);
@@ -113,7 +112,7 @@
 			create:create,
 			add:add,
 			sub:sub,
-			mul:mul
+			dot:dot
 		}
 	}
 	else {

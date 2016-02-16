@@ -108,19 +108,19 @@ describe("an arbitrary matrix", function() {
 		let mat3 = matrix.create(2,2,[1,2, 3,4]);
 		let mat4 = matrix.create(3,2,[-2,2, 0,-2, -6,3]);
 		let mat5 = matrix.create(2,2,[-6,2, -4,-2]);
-		mat1.mul(mat2).toArray().should.eql([1]);
-		mat2.mul(mat1).toArray().should.eql([0,0,0,1]);
-		mat1.mul(mat3).toArray().should.eql([3,4]);
-		mat4.mul(mat5).toArray().should.eql([4,-8, 8,4, 24,-18]); // larger matrices
-		mat1.mul(mat3).mul(mat2).toArray().should.eql([4]); // chaining
+		mat1.dot(mat2).toArray().should.eql([1]);
+		mat2.dot(mat1).toArray().should.eql([0,0,0,1]);
+		mat1.dot(mat3).toArray().should.eql([3,4]);
+		mat4.dot(mat5).toArray().should.eql([4,-8, 8,4, 24,-18]); // larger matrices
+		mat1.dot(mat3).dot(mat2).toArray().should.eql([4]); // chaining
 	});
 	it("should multiply matrixes by scalars", function() {
 		let mat4 = matrix.create(3,2,[-2,2, 0,-2, -6,3]);
-		mat4.mul(3).toArray().should.eql([-6,6, 0,-6, -18,9]);
+		mat4.dot(3).toArray().should.eql([-6,6, 0,-6, -18,9]);
 	});
 	it("should reject incompatible matrixes", function() {
 		let mat1 = matrix.create(1,3);
 		let mat2 = matrix.create(1,3);
-		(mat1.mul(mat2) === undefined).should.eql(true);
+		(mat1.dot(mat2) === undefined).should.eql(true);
 	});
 });
