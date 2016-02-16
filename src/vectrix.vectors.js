@@ -94,7 +94,7 @@
 			map = aliases3d;
 			combos = aliasCombos2d.concat(aliasCombos3d);
 		}
-		else if(vec.length === 4) {
+		else { // it's 4 because nothing else is supported or requested
 			factory = vec4;
 			map = aliases4d;
 			combos = aliasCombos2d.concat(aliasCombos3d, aliasCombos4d);
@@ -137,6 +137,7 @@
 		if(params.length === 0) vals = new Array(len).fill(0);
 		else if(params.length === 1 && params[0].length === len) vals = params[0];
 		else if(params.length === len) vals = params;
+		else throw new Error("Invalid argument length when creating a vector");
 		let vec = matrix.create(len,1,vals);
 		// define vector-specific methods
 		vec.homogenous = homogenous.bind(null, vec);
@@ -145,19 +146,19 @@
 
 	function vec2() {
 		let vec = create(2, arguments);
-		defineAliases(vec, aliases2d);
+		defineAliases(vec);
 		return vec;
 	}
 
 	function vec3() {
 		let vec = create(3, arguments);
-		defineAliases(vec, [].concat(aliases2d, aliases3d));
+		defineAliases(vec);
 		return vec;
 	}
 
 	function vec4() {
 		let vec = create(4, arguments);
-		defineAliases(vec, [].concat(aliases2d, aliases3d, aliases4d));
+		defineAliases(vec);
 		return vec;
 	}
 

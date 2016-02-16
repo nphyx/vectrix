@@ -18,6 +18,9 @@ describe("a 2d vector", function() {
 		let vec = vectors.vec2(3,4);
 		vec.toArray().should.eql([3,4]);
 	});
+	it("should throw an error when given any other number of arguments", function() {
+		(function() {vectors.vec2(1, 2, 3)}).should.throwError();
+	});
 	it("should have all the 2d vector aliases", function() {
 		let vec = vectors.vec2([1,2]);
 		vec.x.should.equal(1);
@@ -71,6 +74,9 @@ describe("a 3d vector", function() {
 	it("should created a populated vector when given three arguments", function() {
 		let vec = vectors.vec3(4,5,6);
 		vec.toArray().should.eql([4,5,6]);
+	});
+	it("should throw an error when given any other number of arguments", function() {
+		(function() {vectors.vec2(1, 2, 3, 4)}).should.throwError();
 	});
 	it("should have all the 3d vector aliases", function() {
 		let vec = vectors.vec3([1,2,3]);
@@ -130,6 +136,9 @@ describe("a 4d vector", function() {
 	it("should created a populated vector when given four arguments", function() {
 		let vec = vectors.vec4(5,6,7,8);
 		vec.toArray().should.eql([5,6,7,8]);
+	});
+	it("should throw an error when given any other number of arguments", function() {
+		(function() {vectors.vec2(1, 2, 3, 4, 5)}).should.throwError();
 	});
 	it("should have all the 4d vector aliases", function() {
 		let vec = vectors.vec4([1,2,3,4]);
