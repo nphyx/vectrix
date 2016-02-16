@@ -23,32 +23,24 @@
 	 * of time making this happen.
 	 */
 
-	/**
-	 * creates the definition for a property alias.
-	 */
-	function vecPropAlias() {
-	}
-
-	function vecPropCombo() {
-		return 	}
-
 	let aliasCombos2d = [];
 	let aliasCombos3d = [];
 	let aliasCombos4d = [];
 
-	let aliases2d = [{name:"x", i:0},{name:"y",i:1}];
+	let aliases2d = [
+		{names:["x"], i:0},
+		{names:["y"],i:1}
+	];
 
 	let aliases3d = [
-		{name:"z",i:2},
-		{name:"r",i:0},
-		{name:"g",i:1},
-		{name:"b",i:2}
+		{names:["x","r"],i:0},
+		{names:["y","g"],i:1},
+		{names:["z","b"],i:2}
 	];
 
 	let aliases4d = [
-		{name:"w",i:3},
-		{name:"a",i:3}
-	];
+		{names:["w", "a"],i:3}
+	].concat(aliases3d);
 
 	permutations("xy".split("")).forEach((combo) => {
 		aliasCombos2d.push(combo);
@@ -97,30 +89,34 @@
 			map = aliases2d;
 			combos = aliasCombos2d;
 		}
-		if(vec.length === 3) {
+		else if(vec.length === 3) {
 			factory = vec3;
-			map = aliases2d.concat(aliases3d);
+			map = aliases3d;
 			combos = aliasCombos2d.concat(aliasCombos3d);
 		}
-		if(vec.length === 4) {
+		else if(vec.length === 4) {
 			factory = vec4;
-			map = aliases2d.concat(aliases3d, aliases4d);
+			map = aliases4d;
 			combos = aliasCombos2d.concat(aliasCombos3d, aliasCombos4d);
 		}
-		map.forEach((alias) => {
-			Object.defineProperty(vec, alias.name, {
-				set:(function(i, val) {this[i] = val}).bind(vec, alias.i),
-				get:(function(i) {return this[i]}).bind(vec, alias.i)
-			});
-		});
-		combos.forEach((combo) => {
-			Object.defineProperty(vec, combo.join(""), {
+		for(let i = 0, len = map.length; i < len; ++i) {
+			let set = (function(i, val) {this[i] = val}).bind(vec, map[i].i); 
+			let get = (function(i) {return this[i]}).bind(vec, map[i].i);
+			for(let n = 0, len = map[i].names.length; n < len; ++n) {
+				Object.defineProperty(vec, map[i].names[n], {
+					set:set,
+					get:get
+				});
+			}
+		}
+		for(let i = 0, len = combos.length; i < len; ++i) {
+			Object.defineProperty(vec, combos[i].join(""), {
 				get:(function(factory, combo) {
 					let vals = combo.map((p) => this[p]);
 					return factory(vals);
-				}).bind(vec, factory, combo)
+				}).bind(vec, factory, combos[i])
 			});
-		});
+		}
 	}
 
 	/*

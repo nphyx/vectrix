@@ -26,8 +26,10 @@ describe("a 2d vector", function() {
 		vec.y.should.equal(2);
 		vec.xy.toArray().should.eql([1,2]);
 		vec.yx.toArray().should.eql([2,1]);
-		vectors.aliases2d.forEach((alias) => {
-			vec.hasOwnProperty(alias.name).should.eql(true, "has alias "+alias.name);
+		vectors.aliases2d.forEach((aliases) => {
+			aliases.names.forEach((name) => {
+				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+			});
 		});
 		vectors.aliasCombos2d.forEach((combo) => {
 			let name = combo.join("");
@@ -82,8 +84,10 @@ describe("a 3d vector", function() {
 		vec.rbg.toArray().should.eql([1,3,2]);
 		vec.bgr.toArray().should.eql([3,2,1]);
 		// skim the rest to make sure they're there
-		vectors.aliases2d.concat(vectors.aliases3d).forEach((alias) => {
-			vec.hasOwnProperty(alias.name).should.eql(true, "has alias "+alias.name);
+		vectors.aliases3d.forEach((aliases) => {
+			aliases.names.forEach((name) => {
+				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+			});
 		});
 		vectors.aliasCombos2d.concat(vectors.aliasCombos3d).forEach((combo) => {
 			let name = combo.join("");
@@ -139,8 +143,10 @@ describe("a 4d vector", function() {
 		vec.rabg.toArray().should.eql([1,4,3,2]);
 		vec.abgr.toArray().should.eql([4,3,2,1]);
 		// skim the rest to make sure they're there
-		vectors.aliases2d.concat(vectors.aliases3d, vectors.aliases4d).forEach((alias) => {
-			vec.hasOwnProperty(alias.name).should.eql(true, "has alias "+alias.name);
+		vectors.aliases4d.forEach((aliases) => {
+			aliases.names.forEach((name) => {
+				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+			});
 		});
 		vectors.aliasCombos2d.concat(vectors.aliasCombos3d, vectors.aliasCombos4d).forEach((combo) => {
 			let name = combo.join("");
