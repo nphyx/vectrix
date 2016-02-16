@@ -69,7 +69,7 @@ It turned out to be useful to get a single row or column from a matrix, so you c
 do that too using `mat.row(N)` and `mat.col(N)`:
 ```javascript
 first.row(0); // matrix(2,1,[1,2])
-first.col(1); // matrix(2,1,[2,4])
+first.col(1); // matrix(1,2,[2,4])
 ```
 
 Vectors
@@ -140,11 +140,11 @@ position.yzx; // vec3(-0.5,0.5,0)
 let color = vectors.vec4(255,128,64,0.1)
 color.rgb; // vec3(255,128,64)
 color.bgr; // vec3(64,128,255)
-// and so on - all aliases and combinations thereof for the xyzw and rgba sets
-// are available. single-property aliases double as setters, but combination aliases
-// only act as getters. I haven't decided whether allowing them to set values is
-// a good idea yet.
 ```
+...and so on - all aliases and combinations thereof for the xyzw and rgba sets
+are available. single-property aliases double as setters, but combination aliases
+only act as getters. I haven't decided whether allowing them to set values is
+a good idea yet.
 
 Notes & Development
 ===================
