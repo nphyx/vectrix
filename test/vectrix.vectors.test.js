@@ -188,3 +188,25 @@ describe("a 4d vector", function() {
 		matrix.dot(vec.homogenous()).toArray().should.eql([-2,8,-1,15,1]);
 	});
 });
+describe("any vector", function() {
+	it("should produce correct dot products for scalars, arrays, vectors, and matrices", function() {
+		let vec = vectors.vec3([1,1,1]);
+		let scalar = 2;
+		let matrix = matrices.create(3,3,[2,0,0, 0,2,0, 0,0,2]);
+		let arr = [1,1,1];
+		let typed = new Float32Array(3);
+		typed.set([1,1,1]);
+		let right = vectors.vec3([0,0,1]);
+		let left = vectors.vec3([0,0,0]);
+		let twodee = vectors.vec2([2,1]);
+		let fourdee = vectors.vec4([2,1,1,1]);
+		vec.dot(vec).should.eql(3, "should produce a correct scalar product when two vectors are multiplied");
+		vec.dot(arr).should.eql(3, "should accept a plain array instead of a vector and produce a vector dot product");
+		vec.dot(typed).should.eql(3, "should accept a typed array instead of a vector and produce a vector dot product");
+		right.dot(left).should.eql(0, "prove the product is zero when vectors at right angles are multiplied");
+		twodee.dot(twodee).should.eql(5, "should work on two-dimensional vectors");
+		fourdee.dot(fourdee).should.eql(7, "should work on a four-dimensional vector");
+		vec.dot(scalar).toArray().should.eql([2,2,2], "should produce a scaled vector when a vector is multiplied by a scalar");
+		matrix.dot(vec).toArray().should.eql([2,2,2], "should return a vector multiplied by a matrix");
+	});
+});

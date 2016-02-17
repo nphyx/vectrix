@@ -2,7 +2,7 @@
 	/**
 	 * Treat vectors as column matrixes, makes this easy.
 	 */
-	const matrix = require("./vectrix.matrices.js");
+	const matrices = require("./vectrix.matrices.js");
 
 	/*
 	 * All of the below is a dumb, slow workaround for the fact
@@ -79,6 +79,19 @@
 		return result;
 	}	
 
+	function setAlias(i, val) {
+		this[i] = val;
+	}
+
+	function getAlias(i) {
+		return this[i];
+	}
+
+	function getAliasCombo(factory, combo) {
+		let vals = combo.map((p) => this[p]);
+		return factory(vals);
+	}
+
 
 	function defineAliases(vec) {
 		let factory;
@@ -100,8 +113,8 @@
 			combos = aliasCombos2d.concat(aliasCombos3d, aliasCombos4d);
 		}
 		for(let i = 0, len = map.length; i < len; ++i) {
-			let set = (function(i, val) {this[i] = val}).bind(vec, map[i].i); 
-			let get = (function(i) {return this[i]}).bind(vec, map[i].i);
+			let set = setAlias.bind(vec, map[i].i); 
+			let get = getAlias.bind(vec, map[i].i);
 			for(let n = 0, len = map[i].names.length; n < len; ++n) {
 				Object.defineProperty(vec, map[i].names[n], {
 					set:set,
@@ -111,10 +124,7 @@
 		}
 		for(let i = 0, len = combos.length; i < len; ++i) {
 			Object.defineProperty(vec, combos[i].join(""), {
-				get:(function(factory, combo) {
-					let vals = combo.map((p) => this[p]);
-					return factory(vals);
-				}).bind(vec, factory, combos[i])
+				get:getAliasCombo.bind(vec, factory, combos[i])
 			});
 		}
 	}
@@ -128,7 +138,23 @@
    * a vector because it's not really useful to do so.
    */
 	function homogenous(vec) {
-		return matrix.create(vec.length+1,1,vec.toArray().concat(1));
+		return matrices.create(vec.length+1,1,vec.toArray().concat(1));
+	}
+
+	/**
+	 * Vector dot product for matching vector types. Accepts vectors or generic arrays, 
+	 * or defaults up to the matrix dot product if the vectors don't match (which supports
+	 * vector*matrix and scalar products).
+	 */
+	function dot(a, b) {
+		// let's duck type the two vectors so we can accept generic arrays too	
+		if(
+			((typeof(b.rows) === "undefined") && (a.length === b.length)) ||
+			((a.rows === b.rows) && (a.cols === 1 && b.cols === 1))
+		) {
+			return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
+		}
+		else return matrices.dot(a, b);
 	}
 
 	function create(len, args) {
@@ -138,9 +164,10 @@
 		else if(params.length === 1 && params[0].length === len) vals = params[0];
 		else if(params.length === len) vals = params;
 		else throw new Error("Invalid argument length when creating a vector");
-		let vec = matrix.create(len,1,vals);
+		let vec = matrices.create(len,1,vals);
 		// define vector-specific methods
 		vec.homogenous = homogenous.bind(null, vec);
+		vec.dot = dot.bind(null, vec);
 		return vec;
 	}
 
