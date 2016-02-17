@@ -39,6 +39,16 @@ describe("a 2d vector", function() {
 			vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
 		});
 	});
+	it("should compute a cross product with (only) a 2d or 3d vector", function() {
+		let a = vectors.vec2(1,2);
+		let b = vectors.vec2(2,1);
+		let c = vectors.vec3(2,-2,2);
+		a.cross(b).toArray().should.eql([0,0,-3]);
+		a.cross(c).toArray().should.eql([4,-2,-6]);
+		(typeof(a.cross([0])) === "undefined").should.be.true();
+		(typeof(a.cross([1,2,3,4])) === "undefined").should.be.true();
+	});
+
 	it("should produce a copy of itself when multiplied by an identity matrix", function() {
 		let vec = vectors.vec2(7,4);
 		let matrix = matrices.create(2,2,[1,0, 0,1]);
@@ -99,6 +109,15 @@ describe("a 3d vector", function() {
 			let name = combo.join("");
 			vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
 		});
+	});
+	it("should compute a cross product with (only) a 2d or 3d vector", function() {
+		let a = vectors.vec3(1,2,1);
+		let b = vectors.vec3(2,-2,2);
+		let c = vectors.vec2(1,2);
+		a.cross(b).toArray().should.eql([6,0,-6]);
+		a.cross(c).toArray().should.eql([-2,1,0]);
+		(typeof(a.cross([0])) === "undefined").should.be.true();
+		(typeof(a.cross([1,2,3,4])) === "undefined").should.be.true();
 	});
 	it("should produce a copy of itself when multiplied by an identity matrix", function() {
 		let vec = vectors.vec3(7,4,13);

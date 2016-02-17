@@ -157,8 +157,23 @@
 		else return matrices.dot(a, b);
 	}
 
+	/**
+	 * Vector cross products are technically only defined for 3D, but 2D can be
+	 * crossed with implicit z=0
+	 */
+	function cross(a, b) {
+		if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
+		if(a.length == 2) a = [a[0], a[1], 0];
+		if(b.length == 2) b = [b[0], b[1], 0];
+		return vec3(
+			a[1]*b[2] - a[2]*b[1],
+			a[2]*b[0] - a[0]*b[2],
+			a[0]*b[1] - a[1]*b[0]
+		);
+	}
+
 	function create(len, args) {
-		let params = [].slice.apply(args);	
+		let params = [].slice.apply(args);
 		let vals = [];
 		if(params.length === 0) vals = new Array(len).fill(0);
 		else if(params.length === 1 && params[0].length === len) vals = params[0];
@@ -173,12 +188,14 @@
 
 	function vec2() {
 		let vec = create(2, arguments);
+		vec.cross = cross.bind(null, vec);
 		defineAliases(vec);
 		return vec;
 	}
 
 	function vec3() {
 		let vec = create(3, arguments);
+		vec.cross = cross.bind(null, vec);
 		defineAliases(vec);
 		return vec;
 	}
