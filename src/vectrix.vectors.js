@@ -79,10 +79,6 @@
 		return result;
 	}	
 
-	function setAlias(i, val) {
-		this[i] = val;
-	}
-
 	function getAlias(i) {
 		return this[i];
 	}
@@ -113,11 +109,9 @@
 			combos = aliasCombos2d.concat(aliasCombos3d, aliasCombos4d);
 		}
 		for(let i = 0, len = map.length; i < len; ++i) {
-			let set = setAlias.bind(vec, map[i].i); 
 			let get = getAlias.bind(vec, map[i].i);
 			for(let n = 0, len = map[i].names.length; n < len; ++n) {
 				Object.defineProperty(vec, map[i].names[n], {
-					set:set,
 					get:get
 				});
 			}
