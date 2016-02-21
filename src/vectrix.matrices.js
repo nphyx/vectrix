@@ -2,6 +2,18 @@
 	"use strict";
 
 	/**
+   * Flattens an array. Used for flattening arguments passed to factories. 
+   */
+	var flatten = function(input) {
+		if(typeof(input) !== "object") return input;
+		let out = [];
+		for(let i = 0, len = input.length; i < len; ++i) {
+			out = out.concat(flatten(input[i]));
+		}
+		return out;
+	}
+
+	/**
 	 * Add two matrices together.
 	 * @param a first matrix
 	 * @param b second matrix
@@ -102,9 +114,10 @@
 	 */
 	function create(rows, cols, values = []) {
 		var matrix = new Float32Array(cols * rows);	
+		var vals = flatten(values);
 		matrix.cols = cols;
 		matrix.rows = rows;
-		if(values.length > 0) matrix.set(values);
+		if(vals.length) matrix.set(vals);
 		matrix.add = add.bind(null, matrix);
 		matrix.sub = sub.bind(null, matrix);
 		matrix.dot = dot.bind(null, matrix);
