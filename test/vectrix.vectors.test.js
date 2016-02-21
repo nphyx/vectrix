@@ -14,7 +14,7 @@ describe("a 2d vector", function() {
 		let vec = vectors.vec2(initial);
 		vec.toArray().should.eql(initial);
 	});
-	it("should created a populated vector when given two arguments", function() {
+	it("should create a populated vector when given two arguments", function() {
 		let vec = vectors.vec2(3,4);
 		vec.toArray().should.eql([3,4]);
 	});
@@ -77,9 +77,17 @@ describe("a 3d vector", function() {
 		let vec = vectors.vec3(initial);
 		vec.toArray().should.eql(initial);
 	});
-	it("should created a populated vector when given three arguments", function() {
+	it("should create a populated vector when given three arguments", function() {
 		let vec = vectors.vec3(4,5,6);
 		vec.toArray().should.eql([4,5,6]);
+	});
+	it("should create a 3d vector given a 2d vector-like object and a z value", function() {
+		let vec = vectors.vec3([0,1], 1);
+		vec.toArray().should.eql([0,1,1]);
+		vec = vectors.vec3(vectors.vec2(4,3), 6);
+		vec.toArray().should.eql([4,3,6]);
+		vec = vectors.vec3(matrices.create(1,2, [0,5]), 3);
+		vec.toArray().should.eql([0,5,3]);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4)}).should.throwError();
@@ -90,6 +98,7 @@ describe("a 3d vector", function() {
 		vec.x.should.equal(1);
 		vec.y.should.equal(2);
 		vec.z.should.equal(3);
+		vec.yz.toArray().should.eql([2,3]);
 		vec.xyz.toArray().should.eql([1,2,3]);
 		vec.zyx.toArray().should.eql([3,2,1]);
 		vec.rgb.toArray().should.eql([1,2,3]);
@@ -134,7 +143,6 @@ describe("a 3d vector", function() {
 		let matrix = matrices.create(4,4,[1,0,0,-9, 0,1,0,4, 0,0,1,-6, 0,0,0,1]);
 		matrix.dot(vec.homogenous()).toArray().should.eql([-2,8,-1,1]);
 	});
-
 });
 describe("a 4d vector", function() {
 	it("should create a vector [0,0,0,0] when given no arguments", function() {
@@ -148,9 +156,22 @@ describe("a 4d vector", function() {
 		let vec = vectors.vec4(initial);
 		vec.toArray().should.eql(initial);
 	});
-	it("should created a populated vector when given four arguments", function() {
+	it("should create a populated vector when given four arguments", function() {
 		let vec = vectors.vec4(5,6,7,8);
 		vec.toArray().should.eql([5,6,7,8]);
+	});
+	it("should create a 4d vector from a combination of vector-like objects and remaining components", function() {
+		let vec = vectors.vec4([0,1], 1, 3);
+		vec.toArray().should.eql([0,1,1,3]);
+		vec = vectors.vec4(vectors.vec3(4,3,6),7);
+		vec.toArray().should.eql([4,3,6,7]);
+		vec = vectors.vec4(vectors.vec2(4,3), [2,2]);
+		vec.toArray().should.eql([4,3,2,2]);
+		vec = vectors.vec4(matrices.create(1,2, [0,5]), 3, 2);
+		vec.toArray().should.eql([0,5,3,2]);
+		let vecb = vectors.vec3([9,7,2]);
+		vec = vectors.vec4(vecb.x, vecb.y, vecb.yz);
+		vec.toArray().should.eql([9,7,7,2]);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4, 5)}).should.throwError();

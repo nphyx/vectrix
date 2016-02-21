@@ -94,17 +94,14 @@
 		let map;
 		let combos;
 		if(vec.length === 2) {
-			factory = vec2;
 			map = aliases2d;
 			combos = aliasCombos2d;
 		}
 		else if(vec.length === 3) {
-			factory = vec3;
 			map = aliases3d;
 			combos = aliasCombos2d.concat(aliasCombos3d);
 		}
 		else { // it's 4 because nothing else is supported or requested
-			factory = vec4;
 			map = aliases4d;
 			combos = aliasCombos2d.concat(aliasCombos3d, aliasCombos4d);
 		}
@@ -117,6 +114,11 @@
 			}
 		}
 		for(let i = 0, len = combos.length; i < len; ++i) {
+			switch(combos[i].length) {
+				case 2:factory = vec2; break;
+				case 3:factory = vec3; break;
+				case 4:factory = vec4; break;
+			}
 			Object.defineProperty(vec, combos[i].join(""), {
 				get:getAliasCombo.bind(vec, factory, combos[i])
 			});
@@ -170,9 +172,10 @@
 		let params = [].slice.apply(args);
 		let vals = [];
 		if(params.length === 0) vals = new Array(len).fill(0);
-		else if(params.length === 1 && params[0].length === len) vals = params[0];
-		else if(params.length === len) vals = params;
-		else throw new Error("Invalid argument length when creating a vector");
+		else vals = args;
+		//else if(params.length === 1 && params[0].length === len) vals = params[0];
+		//else if(params.length === len) vals = params;
+		//else throw new Error("Invalid argument length when creating a vector");
 		let vec = matrices.create(len,1,vals);
 		// define vector-specific methods
 		vec.homogenous = homogenous.bind(null, vec);
@@ -202,6 +205,7 @@
 
 	if(typeof("module") !== undefined) {
 		module.exports = {
+			create:create,
 			vec2:vec2,
 			vec3:vec3,
 			vec4:vec4,

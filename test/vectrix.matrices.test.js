@@ -1,8 +1,6 @@
 "use strict";
 const should = require("should");
 const matrices = require("../src/vectrix.matrices.js");
-//const closeToArray = require("../lib/chai.closetoarray.js");
-//chai.use(closeToArray);
 
 should.Assertion.add("closeToArray", function(arr, delta) {
 	try {
@@ -16,7 +14,7 @@ should.Assertion.add("closeToArray", function(arr, delta) {
 });
 
 describe("an arbitrary matrix", function() {
-	it("should create a matrices", function() {
+	it("should create a matrix", function() {
 		let mat = matrices.create(2, 3);
 		mat.rows.should.eql(2);
 		mat.cols.should.eql(3);

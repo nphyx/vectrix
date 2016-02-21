@@ -184,7 +184,6 @@
 	 * @return a 3x3 matrix for rotating a vector
 	 */
 	create.rotateZ = function(r) {
-		console.log("r", r, "cos", cos(r), "sin", sin(r));
 		return this(3, 3, [1,0,0, 0,cos(r),-sin(r), 0,sin(r),cos(r)]);
 	}
 
