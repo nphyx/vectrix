@@ -37,7 +37,7 @@
 					let col = b.col(n);
 					let sum = 0;
 					for(let m = 0; m < col.length; m++) {
-						sum += col[m]*row[m];	
+						sum += col[m]*row[m];
 					}
 					out.push(sum);
 				}
@@ -83,6 +83,47 @@
 		matrix.toArray = toArray.bind(null, matrix);
 		return matrix;
 	}
+
+	const cos = Math.cos;
+	const sin = Math.sin;
+
+	/**
+	 * Matrix factories
+	 */
+	create.identity = function(n) {
+		// predefine common cases to save needless work
+		switch(n) {
+		case 2: return this(2, 2, [1,0,     0,1]);
+		case 3: return this(3, 3, [1,0,0,   0,1,0,   0,0,1]);
+		case 4: return this(4, 4, [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+		default:
+			let arr = new Array(n*n);
+			arr.fill(0);
+			for(let i = 0, len = arr.length, j = n+1; i < len; i+=j) arr[i] = 1;
+			return this(n, n, arr);
+		}
+	}
+
+	create.translation = function(vec) {
+		switch(vec.length) {
+			case 2: return this(3, 3, [1,0,  vec[0], 0,1,  vec[1], 0,0,1]);
+			case 3: return this(4, 4, [1,0,0,vec[0], 0,1,0,vec[1], 0,0,1,vec[2], 0,0,0,1]);
+			default: return undefined;
+		}
+	}
+	create.rotateY = function(r) {
+		return this(3, 3, [cos(r),0,sin(r), 0,1,0, -sin(r),sin(r),-cos(r)]);
+	}
+
+	create.rotateX = function(r) {
+		return this(3, 3, [cos(r),-sin(r),0, sin(r),cos(r),0, 0,0,1]);
+	}
+
+	create.rotateZ = function(r) {
+		console.log("r", r, "cos", cos(r), "sin", sin(r));
+		return this(3, 3, [1,0,0, 0,cos(r),-sin(r), 0,sin(r),cos(r)]);
+	}
+
 	if(typeof("module") !== "undefined") {
 		module.exports = {
 			create:create,
@@ -90,7 +131,5 @@
 			sub:sub,
 			dot:dot
 		}
-	}
-	else {
 	}
 })();

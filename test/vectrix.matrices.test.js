@@ -1,6 +1,19 @@
 "use strict";
-require("should");
+const should = require("should");
 const matrices = require("../src/vectrix.matrices.js");
+//const closeToArray = require("../lib/chai.closetoarray.js");
+//chai.use(closeToArray);
+
+should.Assertion.add("closeToArray", function(arr, delta) {
+	try {
+		for(let i = 0, len = arr.length; i < len; i++) {
+			this.obj[i].should.be.approximately(arr[i], delta);
+		}
+	}
+	catch(e) {
+		throw new Error("expected ["+this.obj.toString()+"] to be approximately ["+arr.toString()+"] ± "+delta);
+	}
+});
 
 describe("an arbitrary matrix", function() {
 	it("should create a matrices", function() {
@@ -117,3 +130,81 @@ describe("an arbitrary matrix", function() {
 		(mat1.dot(mat2) === undefined).should.eql(true);
 	});
 });
+
+/** 
+ * use a generic columnar matrix in the tests below so we're not dependent on 
+ * the vector library before its tests run
+ */
+describe("a translation matrix", function() {
+	it("should create a translation for 2d vectors and translate them correctly", function() {
+		let trans = matrices.create.translation([3,2]);
+		let vec = matrices.create(3,1,[-5,2,1]);
+		trans.dot(vec).toArray().should.eql([-2,4,1]);
+	});
+	it("should create a translation for 3d vectors and translate them correctly", function() {
+		let trans = matrices.create.translation([-5,7,13]);
+		let vec = matrices.create(4,1,[6,-5,2,1]);
+		trans.dot(vec).toArray().should.eql([1,2,15,1]);
+	});
+	it("should have an undefined value for unsupported parameters", function() {
+		let trans = matrices.create.translation([1,1,1,1,1,1]);
+		(trans === undefined).should.be.true();
+		trans = matrices.create.translation([1]);
+		(trans === undefined).should.be.true();
+		trans = matrices.create.translation("nope");
+		(trans === undefined).should.be.true();
+		trans = matrices.create.translation(2);
+		(trans === undefined).should.be.true();
+	});
+});
+describe("an identity matrix", function() {
+	it("should produce an identity matrix for any value of n", function() {
+		let ident = matrices.create.identity(2);
+		ident.toArray().should.eql([1,0, 0,1]);
+		ident = matrices.create.identity(3);
+		ident.toArray().should.eql([1,0,0, 0,1,0, 0,0,1]);
+		ident = matrices.create.identity(4);
+		ident.toArray().should.eql([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+		ident = matrices.create.identity(5);
+		ident.toArray().should.eql([1,0,0,0,0, 0,1,0,0,0, 0,0,1,0,0, 0,0,0,1,0, 0,0,0,0,1]);
+		ident = matrices.create.identity(6);
+		ident.toArray().should.eql([1,0,0,0,0,0, 0,1,0,0,0,0, 0,0,1,0,0,0,
+		                            0,0,0,1,0,0, 0,0,0,0,1,0, 0,0,0,0,0,1]);
+		ident = matrices.create.identity(7);
+		ident.toArray().should.eql([1,0,0,0,0,0,0, 0,1,0,0,0,0,0, 0,0,1,0,0,0,0, 
+		                            0,0,0,1,0,0,0, 0,0,0,0,1,0,0, 0,0,0,0,0,1,0, 
+																0,0,0,0,0,0,1]);
+		ident = matrices.create.identity(8);
+		ident.toArray().should.eql([1,0,0,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,0,1,0,0,0,0,0, 
+		                            0,0,0,1,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,1,0,0, 
+																0,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,1]);
+		// not gonna test any farther than that, it should be working
+	});
+});
+describe("rotation matrices", function() {
+	let r90 = 90*Math.PI/180; // 90 degrees in radians
+	let rotateZ = matrices.create.rotateZ(r90); // do a 90 degree rotation
+	let rotateY = matrices.create.rotateY(r90); // do a 90 degree rotation
+	let rotateX = matrices.create.rotateX(r90); // do a 90 degree rotation
+	let a = matrices.create(3,1,[0,0,1]);
+	let b = matrices.create(3,1,[1,0,0]);
+	it("should produce a rotateX matrix that rotates 3d vectors around the x axis", function() {
+		// floating point precision will cause these to be just slightly off, but that's ok
+		rotateX.dot(b).toArray().should.be.closeToArray([0,1,0], 1.0e-16);
+	});
+	it("should produce a rotateY matrix that rotates 3d vectors around the y axis", function() {
+		rotateY.dot(a).toArray().should.be.closeToArray([1,0,0], 1.0e-16);
+	});
+	it("should produce a rotateZ matrix that rotates 3d vectors around the z axis", function() {
+		rotateZ.dot(a).toArray().should.be.closeToArray([0,-1,0], 1.0e-16);
+	});
+	it("should produce correct outputs when rotations are chained using dot", function() {
+		let zyx = rotateZ.dot(rotateY).dot(rotateX);
+		let yzx = rotateY.dot(rotateZ).dot(rotateX);
+		let xzy = rotateX.dot(rotateZ).dot(rotateY);
+		zyx.dot(a).toArray().should.be.closeToArray([1,0,0], 1.0e-16);
+		yzx.dot(a).toArray().should.be.closeToArray([0,-1,-1], 1.0e-16);
+		xzy.dot(a).toArray().should.be.closeToArray([0,1,0], 1.0e-16);
+	});
+});
+
