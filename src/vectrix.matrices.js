@@ -87,8 +87,14 @@
 	const cos = Math.cos;
 	const sin = Math.sin;
 
-	/**
+	/*
 	 * Matrix factories
+	 */
+
+	/**
+	 * Creates an identity matrix of arbitrary dimensions.
+	 * @param n dimensions of the matrix
+	 * @return identity matrix
 	 */
 	create.identity = function(n) {
 		// predefine common cases to save needless work
@@ -104,21 +110,43 @@
 		}
 	}
 
-	create.translation = function(vec) {
-		switch(vec.length) {
-			case 2: return this(3, 3, [1,0,  vec[0], 0,1,  vec[1], 0,0,1]);
-			case 3: return this(4, 4, [1,0,0,vec[0], 0,1,0,vec[1], 0,0,1,vec[2], 0,0,0,1]);
+	/**
+	 * Creates a translation matrix for a homogenous coordinate in 2D or 3D space. 
+	 * @param v vector representing the distance to translate 
+	 * @return 3x3 or 4x4 matrix
+	 */
+	create.translation = function(v) {
+		switch(v.length) {
+			case 2: return this(3, 3, [1,0,  v[0], 0,1,  v[1], 0,0,1]);
+			case 3: return this(4, 4, [1,0,0,v[0], 0,1,0,v[1], 0,0,1,v[2], 0,0,0,1]);
 			default: return undefined;
 		}
 	}
+
+	/**
+	 * Creates a rotation matrix around absolute Z axis of angle r.
+	 * @param r angle as a radian
+	 * @return a 3x3 matrix
+	 */
 	create.rotateY = function(r) {
 		return this(3, 3, [cos(r),0,sin(r), 0,1,0, -sin(r),sin(r),-cos(r)]);
 	}
 
+
+	/**
+	 * Creates a rotation matrix around absolute Z axis of angle r.
+	 * @param r angle as a radian
+	 * @return a 3x3 matrix for rotating a vector
+	 */
 	create.rotateX = function(r) {
 		return this(3, 3, [cos(r),-sin(r),0, sin(r),cos(r),0, 0,0,1]);
 	}
 
+	/**
+	 * Creates a rotation matrix around absolute Z axis of angle r.
+	 * @param r angle as a radian
+	 * @return a 3x3 matrix for rotating a vector
+	 */
 	create.rotateZ = function(r) {
 		console.log("r", r, "cos", cos(r), "sin", sin(r));
 		return this(3, 3, [1,0,0, 0,cos(r),-sin(r), 0,sin(r),cos(r)]);
