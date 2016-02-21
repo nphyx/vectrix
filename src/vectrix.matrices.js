@@ -1,11 +1,11 @@
 (function() {
 	"use strict";
-	/**
-	 * The generic matrix type, upon which other matrices are built.
-	 */
 
 	/**
 	 * Add two matrices together.
+	 * @param a first matrix
+	 * @param b second matrix
+	 * @return sum matrix
 	 */
 	function add(a, b) {
 		if(typeof(b) === "number") return create(a.rows,a.cols, a.map((cur) => cur + b));
@@ -16,7 +16,10 @@
 	}
 
 	/**
-	 * Subtract matrices. Subtraction isn't commutative so you can't do multiple subtracts.
+	 * Subtract matrices.
+	 * @param a first matrix
+	 * @param b second matrix
+	 * @return difference matrix
 	 */
 	function sub(a, b) {
 		if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur - b));
@@ -26,6 +29,9 @@
 
 	/**
 	 * Multiply multiple matrices.
+	 * @param a first matrix
+	 * @param b second matrix
+	 * @return matrix dot product
 	 */
 	function dot(a, b) {
 		if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur*b));
@@ -47,6 +53,11 @@
 		else return undefined;
 	}
 
+	/**
+	 * @param matrix
+	 * @param n column number (zero indexed)
+	 * @return a single column from a matrix
+	 */
 	function col(mat, n) {
 		let out = new Float32Array(mat.rows);
 		for(let i = 0; i < mat.rows; i++) {
@@ -55,6 +66,11 @@
 		return out;
 	}
 
+	/**
+	 * @param matrix
+	 * @param n row number (zero indexed)
+	 * @return a single row from a matrix
+	 */
 	function row(mat, n) {
 		let out = new Float32Array(mat.cols);
 		for(let i = 0; i < mat.cols; i++) {
@@ -63,12 +79,26 @@
 		return out;
 	}
 
+	/**
+	 * @return matrix values as flat array
+	 */
 	function toArray(mat) {
 		return [].slice.apply(mat);
 	}
 
+	const cos = Math.cos;
+	const sin = Math.sin;
+
+	/*
+	 * Matrix factories
+	 */
+
 	/**
-	 * Factory for creating matrices.
+	 * Factory for creating generic matrices.
+	 * @param rows matrix rows
+	 * @param cols matrix columsn
+	 * @param values matrix values as an array
+	 * @return matrix
 	 */
 	function create(rows, cols, values = []) {
 		var matrix = new Float32Array(cols * rows);	
@@ -83,13 +113,6 @@
 		matrix.toArray = toArray.bind(null, matrix);
 		return matrix;
 	}
-
-	const cos = Math.cos;
-	const sin = Math.sin;
-
-	/*
-	 * Matrix factories
-	 */
 
 	/**
 	 * Creates an identity matrix of arbitrary dimensions.
