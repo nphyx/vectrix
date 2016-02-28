@@ -21,6 +21,33 @@ gulp.task("test", function() {
 	}))
 });
 
+gulp.task("test:vectors", function() {
+	return gulp.src(["test/vectrix.vectors.test.js"])
+	.pipe(mocha({
+		compilers: {
+			js: mochaBabel
+		}
+	}))
+});
+
+gulp.task("test:matrices", function() {
+	return gulp.src(["test/vectrix.matrices.test.js"])
+	.pipe(mocha({
+		compilers: {
+			js: mochaBabel
+		}
+	}))
+});
+
+gulp.task("test:quaternions", function() {
+	return gulp.src(["test/vectrix.quaternions.test.js"])
+	.pipe(mocha({
+		compilers: {
+			js: mochaBabel
+		}
+	}))
+});
+
 gulp.task("test:coverage", function(cb) {
 	gulp.src(["src/*js"])
 	.pipe(istanbul({
