@@ -1,7 +1,19 @@
 "use strict";
-require("should");
+const should = require("should");
 const vectors = require("../src/vectrix.vectors.js");
 const matrices = require("../src/vectrix.matrices.js");
+
+should.Assertion.add("nearly", function(arr, delta) {
+	try {
+		for(let i = 0, len = arr.length; i < len; i++) {
+			this.obj[i].should.be.approximately(arr[i], delta);
+		}
+	}
+	catch(e) {
+		throw new Error("expected ["+this.obj.toString()+"] to be approximately ["+arr.toString()+"] ± "+delta);
+	}
+});
+
 describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
 		let vec = vectors.vec2();
@@ -244,5 +256,13 @@ describe("any vector", function() {
 		fourdee.dot(fourdee).should.eql(7, "should work on a four-dimensional vector");
 		vec.dot(scalar).toArray().should.eql([2,2,2], "should produce a scaled vector when a vector is multiplied by a scalar");
 		matrix.dot(vec).toArray().should.eql([2,2,2], "should return a vector multiplied by a matrix");
+	});
+	it("should normalize a vector of any length", function() {
+		let vec2 = vectors.vec2([21, 4]);
+		let vec3 = vectors.vec3([9, 18, 27]);
+		let vec4 = vectors.vec4([16, 92, 73, 1]);
+		vec2.normalize().should.be.nearly([0.982339, 0.187112], 1.0e-6);
+		vec3.normalize().should.be.nearly([0.267261, 0.534522, 0.801784], 1.0e-6);
+		vec4.normalize().should.be.nearly([0.134984, 0.776157, 0.615864, 0.00843649], 1.0e-6);
 	});
 });

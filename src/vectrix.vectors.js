@@ -137,10 +137,20 @@
 		return matrices.create(vec.length+1,1,vec.toArray().concat(1));
 	}
 
+	function normalize(a) {
+		return a.dot(1 / Math.sqrt( // find magnitude and multiply by a
+			a.map((cur) => cur*cur) // find squares
+			 .reduce((prev, cur) => prev+cur, 0) // sum squares
+		));
+	}
+
 	/**
 	 * Vector dot product for matching vector types. Accepts vectors or generic arrays, 
 	 * or defaults up to the matrix dot product if the vectors don't match (which supports
 	 * vector*matrix and scalar products).
+	 * @param a first operand
+	 * @param b second operand
+	 * @return [matrix|scalar] dot product of a and b 
 	 */
 	function dot(a, b) {
 		// let's duck type the two vectors so we can accept generic arrays too	
@@ -180,6 +190,7 @@
 		// define vector-specific methods
 		vec.homogenous = homogenous.bind(null, vec);
 		vec.dot = dot.bind(null, vec);
+		vec.normalize = normalize.bind(null, vec);
 		return vec;
 	}
 

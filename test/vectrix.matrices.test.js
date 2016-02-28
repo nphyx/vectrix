@@ -2,7 +2,7 @@
 const should = require("should");
 const matrices = require("../src/vectrix.matrices.js");
 
-should.Assertion.add("closeToArray", function(arr, delta) {
+should.Assertion.add("nearly", function(arr, delta) {
 	try {
 		for(let i = 0, len = arr.length; i < len; i++) {
 			this.obj[i].should.be.approximately(arr[i], delta);
@@ -188,21 +188,21 @@ describe("rotation matrices", function() {
 	let b = matrices.create(3,1,[1,0,0]);
 	it("should produce a rotateX matrix that rotates 3d vectors around the x axis", function() {
 		// floating point precision will cause these to be just slightly off, but that's ok
-		rotateX.dot(b).toArray().should.be.closeToArray([0,1,0], 1.0e-16);
+		rotateX.dot(b).toArray().should.be.nearly([0,1,0], 1.0e-16);
 	});
 	it("should produce a rotateY matrix that rotates 3d vectors around the y axis", function() {
-		rotateY.dot(a).toArray().should.be.closeToArray([1,0,0], 1.0e-16);
+		rotateY.dot(a).toArray().should.be.nearly([1,0,0], 1.0e-16);
 	});
 	it("should produce a rotateZ matrix that rotates 3d vectors around the z axis", function() {
-		rotateZ.dot(a).toArray().should.be.closeToArray([0,-1,0], 1.0e-16);
+		rotateZ.dot(a).toArray().should.be.nearly([0,-1,0], 1.0e-16);
 	});
 	it("should produce correct outputs when rotations are chained using dot", function() {
 		let zyx = rotateZ.dot(rotateY).dot(rotateX);
 		let yzx = rotateY.dot(rotateZ).dot(rotateX);
 		let xzy = rotateX.dot(rotateZ).dot(rotateY);
-		zyx.dot(a).toArray().should.be.closeToArray([1,0,0], 1.0e-16);
-		yzx.dot(a).toArray().should.be.closeToArray([0,-1,-1], 1.0e-16);
-		xzy.dot(a).toArray().should.be.closeToArray([0,1,0], 1.0e-16);
+		zyx.dot(a).toArray().should.be.nearly([1,0,0], 1.0e-16);
+		yzx.dot(a).toArray().should.be.nearly([0,-1,-1], 1.0e-16);
+		xzy.dot(a).toArray().should.be.nearly([0,1,0], 1.0e-16);
 	});
 });
 
