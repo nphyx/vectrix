@@ -1,17 +1,7 @@
 "use strict";
 const should = require("should");
 const matrices = require("../src/vectrix.matrices.js");
-
-should.Assertion.add("nearly", function(arr, delta) {
-	try {
-		for(let i = 0, len = arr.length; i < len; i++) {
-			this.obj[i].should.be.approximately(arr[i], delta);
-		}
-	}
-	catch(e) {
-		throw new Error("expected ["+this.obj.toString()+"] to be approximately ["+arr.toString()+"] ± "+delta);
-	}
-});
+require("./helpers/should.nearly.js");
 
 describe("an arbitrary matrix", function() {
 	it("should create a matrix", function() {

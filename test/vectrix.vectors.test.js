@@ -1,18 +1,8 @@
 "use strict";
-const should = require("should");
+require("should");
 const vectors = require("../src/vectrix.vectors.js");
 const matrices = require("../src/vectrix.matrices.js");
-
-should.Assertion.add("nearly", function(arr, delta) {
-	try {
-		for(let i = 0, len = arr.length; i < len; i++) {
-			this.obj[i].should.be.approximately(arr[i], delta);
-		}
-	}
-	catch(e) {
-		throw new Error("expected ["+this.obj.toString()+"] to be approximately ["+arr.toString()+"] ± "+delta);
-	}
-});
+require("./helpers/should.nearly.js");
 
 describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
