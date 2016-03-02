@@ -255,4 +255,33 @@ describe("any vector", function() {
 		vec3.normalize().should.be.nearly([0.267261, 0.534522, 0.801784], 1.0e-6);
 		vec4.normalize().should.be.nearly([0.134984, 0.776157, 0.615864, 0.00843649], 1.0e-6);
 	});
+	it("should perform linear interpolations correctly on like vectors", function() {
+		let vec2 = vectors.vec2([2,3]);
+		let vec3 = vectors.vec3([4,8,16]);
+		let vec4 = vectors.vec4([9,18,27,1]);
+		vec2.lerp([4,6], 0.5).toArray().should.eql([3,4.5]);
+		vec3.lerp([2,4,8], 0.5).toArray().should.eql([3,6,12]);
+		vec4.lerp([0,0,0,0], 0.666666).toArray().should.be.nearly([3,6,9,0.3333], 1.0e-3);
+		// extrapolation should work too
+		vec2.lerp([4,6], 0).toArray().should.eql([2,3]);
+		vec2.lerp([4,6], -1).toArray().should.eql([0,0]);
+		vec2.lerp([4,6], 1).toArray().should.eql([4,6]);
+		vec2.lerp([4,6], 2).toArray().should.eql([6,9]);
+	});
+	it("should perform cubic interpolations correctly on like vectors", function() {
+		// can only verify 2d with precalculated values for lack of good source for 3d or 
+		// 4d, but "should" work for 3d and 4d vectors too :/
+		let vec2 = vectors.vec2([5,6]);
+		vec2.cubic([9,7],[4,4],[10,8],0.5).toArray().should.eql([6.75,5.875]);
+	});
+	it("should find the angle between any two like vectors", function() {
+		vectors.vec2([1,0]).angle([0,1]).should.eql(90*Math.PI/180);
+		vectors.vec3([1,1,0]).angle([0,0,1]).should.eql(90*Math.PI/180);
+		vectors.vec4([1,1,1,0]).angle([0,0,0,1]).should.eql(90*Math.PI/180);
+	});
+	it("should find the distance between any two like vectors", function() {
+		vectors.vec2([0,0]).distance([3,4]).should.eql(5);
+		vectors.vec3([0,0,0]).distance([0,6,8]).should.eql(10);
+		vectors.vec4([0,0,0,0]).distance([0,0,8,15]).should.eql(17);
+	});
 });

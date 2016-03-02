@@ -137,11 +137,71 @@
 		return matrices.create(vec.length+1,1,vec.toArray().concat(1));
 	}
 
+	/**
+	 * Normalize a vector.
+	 * @param a vector to normalize
+	 * @return vector
+	 */
 	function normalize(a) {
-		return a.dot(1 / Math.sqrt( // find magnitude and multiply by a
-			a.map((cur) => cur*cur) // find squares
-			 .reduce((prev, cur) => prev+cur, 0) // sum squares
-		));
+		let sqrt = Math.sqrt;
+		let sum = a.map((cur) => cur*cur).reduce((prev, cur) => prev+cur, 0);
+		return create(a.length, a.map((cur) => cur*1/sqrt(sum)));
+	}
+
+	/**
+	 * Perform a linear interpolation between two vectors.
+	 * @param a first operand
+	 * @param b second operand
+	 * @param t interval
+	 * @return vector
+	 */
+	function lerp(a, b, t) {
+		return create(a.length, a.map((cur, i) => a[i]+t*(b[i]-a[i])));
+	}
+
+	/**
+	 * Perform a cubic bezier interpolation
+	 * @param a start point
+	 * @param b first control point
+	 * @param c second control point
+	 * @param d end point
+	 * @param t interval
+	 * @return vector
+	 */
+	function cubic(a, b, c, d, t) {
+		/* parametric cubic bezier, faster than dec */
+		let inv = 1-t,
+				inv2 = inv*inv,
+				fs = t*t,
+				f0 = inv2 * inv,
+				f1 = 3 * t * inv2,
+				f2 = 3 * fs * inv,
+				f3 = fs * t;
+		return create(a.length, a.map((cur, i) => a[i]*f0 + b[i]*f1 + c[i]*f2 + d[i]*f3));	
+	}
+
+	/**
+	 * Find the angle between two vectors in radians.
+	 * @param a first operand
+	 * @param b second operand
+	 * @return vector
+	 */
+	function angle(a, b) {
+		let anorm = normalize(a);
+		let bnorm = normalize(b);
+		var cos = anorm.dot(bnorm);
+		return cos < 1.0?Math.acos(cos):0;
+	}
+
+	/**
+	 * Find the distance between two vectors.
+	 * @param a first operand
+	 * @param b second operand
+	 * @return distance
+	 */
+	function distance(a, b) {
+		let dist = a.map((cur, i) => b[i] - a[i]);
+		return Math.sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
 	}
 
 	/**
@@ -191,6 +251,10 @@
 		vec.homogenous = homogenous.bind(null, vec);
 		vec.dot = dot.bind(null, vec);
 		vec.normalize = normalize.bind(null, vec);
+		vec.lerp = lerp.bind(null, vec);
+		vec.cubic = cubic.bind(null, vec);
+		vec.angle = angle.bind(null, vec);
+		vec.distance = distance.bind(null, vec);
 		return vec;
 	}
 
