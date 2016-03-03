@@ -28,7 +28,7 @@ let rotX = matrices.create.rotateX(3.24); // a rotation matrix
 Do stuff with them:
 ```javascript
 // add something to xy
-xy.add([7,3]).toArray(); // [7,4]
+xy.plus([7,3]).toArray(); // [7,4]
 // check out these aliases, and by the way, add didn't mutate it!
 xy.yx; // vec2(1,0);
 // find the dot product of two vectors
