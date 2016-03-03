@@ -284,4 +284,9 @@ describe("any vector", function() {
 		vectors.vec3([0,0,0]).distance([0,6,8]).should.eql(10);
 		vectors.vec4([0,0,0,0]).distance([0,0,8,15]).should.eql(17);
 	});
+	it("should produce a string representation of itself", function() {
+		vectors.vec2([13,1]).toString().should.eql("vec2(13.00, 1.00)");
+		vectors.vec3([13,1,22]).toString().should.eql("vec3(13.00, 1.00, 22.00)");
+		vectors.vec4([13,1,22,123]).toString().should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
+	});
 });

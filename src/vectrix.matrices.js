@@ -14,16 +14,16 @@ Create a 2x2 matrix using `create(rows, columns, values)`:
 let mat = matrices.create(2,2,[0,1, 2,3]);
 ```
 
-Add two matrices using `a.add(b)`:
+Add two matrices using `a.plus(b)`:
 ```javascript
 let first =  matrices.create(2,2,[1,2, 3,4]);
 let second = matrices.create(2,2,[3,4, 5,6]);
-let sum = first.add(second);
+let sum = first.plus(second);
 ```
 
-Subtract two matrices with `a.sub(b)`:
+Subtract two matrices with `a.minus(b)`:
 ```javascript
-let diff = second.sub(first);
+let diff = second.minus(first);
 ```
 
 Get the dot product of two matrices via `a.dot(b)`:
@@ -189,6 +189,39 @@ function toArray(a) {
 	return [].slice.apply(a);
 }
 
+/**
+ * Get a nicely formatted string representation of a matrix.
+ * @example
+ * matToString(matrix); // function
+ * matrix.toString(); // method
+ * @param {matrix} a
+ * @return {string}
+ */
+function matToString(a) {
+	let string = "matrix(",
+			c = a.cols,
+			r = a.rows,
+	    padLeft = function(l,s) {return Array(l-s.length+1).join(" ")+s},
+	    strings = a.toArray().map((cur) => cur.toFixed(2)),
+	    colWidths = new Array(c).fill(0);
+	for(let i = 0; i < r; ++i) {
+		let row = strings.slice(i*c, 2*(i+1)*c);
+		for(let n = 0; n < c; ++n) {
+			let strLen = row[n].length;
+			colWidths[i] = strLen > colWidths[i]?strLen:colWidths[i];
+		}
+	}
+	for(let i = 0, len = strings.length; i < len; ++i) {
+		strings[i] = padLeft(colWidths[i%c], strings[i]);
+		if(i > 0) {
+			if(i % c === 0) string += "\n       ";
+			else string += ", ";
+		}
+		string += strings[i];
+	}
+	return string + ")";
+}
+
 const cos = Math.cos;
 const sin = Math.sin;
 
@@ -215,12 +248,12 @@ function create(rows, cols, values = []) {
 	matrix.col = col.bind(null, matrix);
 	matrix.row = row.bind(null, matrix);
 	matrix.toArray = toArray.bind(null, matrix);
+	matrix.toString = matToString.bind(null, matrix);
 	return matrix;
 }
 
 /**
  * Creates an identity matrix of arbitrary dimensions.
- * @name create.identity
  * @example
  * matrices.create.identity(4); // a 4x4 identity matrix
  * @param {int} n dimensions of the matrix
@@ -242,7 +275,6 @@ create.identity = function(n) {
 
 /**
  * Creates a translation matrix for a homogenous coordinate in 2D or 3D space. 
- * @name create.translation
  * @example
  * let vec = vectors.create.vec3(3,4,5).toHomogenous();
  * matrices.create.identity(vec); // translates by 3x, 4y, 5z
@@ -259,7 +291,6 @@ create.translation = function(v) {
 
 /**
  * Creates a rotation matrix around absolute Y axis of angle r.
- * @name create.rotateY
  * @example
  * matrices.create.rotateY(1.5708); // 90 degree rotation around Y axis
  * @param {radian} r angle as a radian
@@ -271,7 +302,6 @@ create.rotateY = function(r) {
 
 /**
  * Creates a rotation matrix around absolute X axis of angle r.
- * @name create.rotateX
  * @example
  * matrices.create.rotateX(1.5708); // 90 degree rotation around X axis
  * @param {radian} r angle as a radian
@@ -283,7 +313,6 @@ create.rotateX = function(r) {
 
 /**
  * Creates a rotation matrix around absolute Z axis of angle r.
- * @name create.rotateZ
  * @example
  * matrices.create.rotateZ(1.5708); // 90 degree rotation around Z axis
  * @param {radian} r angle as a radian
@@ -298,6 +327,7 @@ if(typeof("module") !== "undefined") {
 		create:create,
 		plus:plus,
 		minus:minus,
-		dot:dot
+		dot:dot,
+		matToString:matToString
 	}
 }

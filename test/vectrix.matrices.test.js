@@ -1,5 +1,4 @@
 "use strict";
-const should = require("should");
 const matrices = require("../src/vectrix.matrices.js");
 require("./helpers/should.nearly.js");
 
@@ -23,9 +22,15 @@ describe("an arbitrary matrix", function() {
 		mat.length.should.eql(9);
 		mat.forEach((val) => val.should.eql(0));
 	});
-	it("should be able to produce an array from itself", function() {
+	it("should produce an array representation of itself", function() {
 		let mat = matrices.create(2,2,[0,1,2,3]);
 		mat.toArray().should.eql([0,1,2,3]);
+	});
+	it("should produce a string representation of itself", function() {
+		let mat = matrices.create(2,2,[13,1, 1,12]);
+		mat.toString().should.eql("matrix(13.00,  1.00\n        1.00, 12.00)");
+		let iden = matrices.create(4,4,[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+		iden.toString().should.eql("matrix(1.00, 0.00, 0.00, 0.00\n       0.00, 1.00, 0.00, 0.00\n       0.00, 0.00, 1.00, 0.00\n       0.00, 0.00, 0.00, 1.00)");
 	});
 	it("should be able to return its rows", function() {
 		let mat = matrices.create(3,3,[0,1,2,3,4,5,6,7,8]);

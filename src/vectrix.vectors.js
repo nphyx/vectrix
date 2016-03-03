@@ -371,6 +371,19 @@ function cross(a, b) {
 	);
 }
 
+/**
+ * Get a string representation of a vector.
+ * @example
+ * vectors.create.vec2([23,1]).toString(); // vec2(23.00, 1.00)
+ * vecToString(vectors.create.vec2([23,1])); // vec2(23.00, 1.00)
+ * @param {vector} a input vector
+ * @return {string}
+ */
+function vecToString(a) {
+	let strings = a.toArray().map((cur) => cur.toFixed(2));
+	return "vec"+a.length+"("+strings.join(", ")+")";
+}
+
 /**  
  * Creates a new vector. Note that vectors created directly with this function
  * will not have convenience aliases, meaning they're initialized faster but...
@@ -394,6 +407,7 @@ function create(len, args) {
 	vec.cubic = cubic.bind(null, vec);
 	vec.angle = angle.bind(null, vec);
 	vec.distance = distance.bind(null, vec);
+	vec.toString = vecToString.bind(null, vec);
 	return vec;
 }
 
@@ -445,6 +459,7 @@ if(typeof("module") !== undefined) {
 		cubic:cubic,
 		angle:angle,
 		distance:distance,
+		vecToString:vecToString,
 		aliases2d:aliases2d,
 		aliases3d:aliases3d,
 		aliases4d:aliases4d,
