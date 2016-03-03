@@ -42,59 +42,59 @@ describe("an arbitrary matrix", function() {
 	it("should add like matrices", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
-		let out = mat1.add(mat2);
+		let out = mat1.plus(mat2);
 		out.toArray().should.eql([3,3,3,3]);
 	});
 	it("should add scalars to matrices", function() {
 		let mat1 = matrices.create(3,3).fill(4);
-		mat1.add(2).toArray().should.eql(new Array(9).fill(6));
+		mat1.plus(2).toArray().should.eql(new Array(9).fill(6));
 	});
 	it("should not mutate any of its operands during an add", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
-		let out1 = mat1.add(mat2);
+		let out1 = mat1.plus(mat2);
 		mat1.toArray().should.eql([1,1,1,1]);
 		mat2.toArray().should.eql([2,2,2,2]);
 		out1.toArray().should.eql([3,3,3,3]);
-		mat1.add(mat3).toArray().should.eql([2,3,4,5]);
+		mat1.plus(mat3).toArray().should.eql([2,3,4,5]);
 		let scalar = 2;
-		mat1.add(scalar);
+		mat1.plus(scalar);
 		scalar.should.eql(2);
 	});
 	it("should subtract like matrices", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
-		let out = mat1.sub(mat2);
+		let out = mat1.minus(mat2);
 		out.toArray().should.eql([-1,-1,-1,-1]);
-		mat3.sub(mat1).toArray().should.eql([0,1,2,3]);
+		mat3.minus(mat1).toArray().should.eql([0,1,2,3]);
 	});
 	it("should subtract scalars from matrices", function() {
 		let mat1 = matrices.create(3,3).fill(4);
-		mat1.sub(2).toArray().should.eql(new Array(9).fill(2));
+		mat1.minus(2).toArray().should.eql(new Array(9).fill(2));
 	});
-	it("should not mutate any of its operands during a sub", function() {
+	it("should not mutate any of its operands during a subtract", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
-		let out1 = mat1.sub(mat2);
-		let out2 = out1.sub(mat1);
+		let out1 = mat1.minus(mat2);
+		let out2 = out1.minus(mat1);
 		mat1.toArray().should.eql([1,1,1,1]);
 		mat2.toArray().should.eql([2,2,2,2]);
 		out1.toArray().should.eql([-1,-1,-1,-1]);
 		out2.toArray().should.eql([-2,-2,-2,-2]);
 		let scalar = 2;
-		mat1.sub(scalar);
+		mat1.minus(scalar);
 		scalar.should.eql(2);
 	});
-	it("should reject unlike matrices during add and sub", function() {
+	it("should reject unlike matrices during add and subtract", function() {
 		let mat1 = matrices.create(2,3,[3,3,3,3,3,3]);
 		let mat2 = matrices.create(3,2,[3,3,3,3,3,3]);
 		let mat3 = matrices.create(1,4,[1,1,1,1]);
-		(mat1.add(mat2) === undefined).should.eql(true);
-		(mat1.add(mat3) === undefined).should.eql(true);
-		(mat1.sub(mat2) === undefined).should.eql(true);
-		(mat1.sub(mat3) === undefined).should.eql(true);
+		(mat1.plus(mat2) === undefined).should.eql(true);
+		(mat1.plus(mat3) === undefined).should.eql(true);
+		(mat1.minus(mat2) === undefined).should.eql(true);
+		(mat1.minus(mat3) === undefined).should.eql(true);
 	});
 	it("should multiply two compatible matrices", function() {
 		let mat1 = matrices.create(1,2,[0, 1]);

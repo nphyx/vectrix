@@ -115,9 +115,9 @@
 		}
 		for(let i = 0, len = combos.length; i < len; ++i) {
 			switch(combos[i].length) {
-				case 2:factory = vec2; break;
-				case 3:factory = vec3; break;
-				case 4:factory = vec4; break;
+				case 2:factory = create.vec2; break;
+				case 3:factory = create.vec3; break;
+				case 4:factory = create.vec4; break;
 			}
 			Object.defineProperty(vec, combos[i].join(""), {
 				get:getAliasCombo.bind(vec, factory, combos[i])
@@ -189,7 +189,7 @@
 	function angle(a, b) {
 		let anorm = normalize(a);
 		let bnorm = normalize(b);
-		var cos = anorm.dot(bnorm);
+		var cos = anorm.times(bnorm);
 		return cos < 1.0?Math.acos(cos):0;
 	}
 
@@ -205,22 +205,16 @@
 	}
 
 	/**
-	 * Vector dot product for matching vector types. Accepts vectors or generic arrays, 
-	 * or defaults up to the matrix dot product if the vectors don't match (which supports
+	 * Vector times product for matching vector types. Accepts vectors or generic arrays, 
+	 * or defaults up to the matrix times product if the vectors don't match (which supports
 	 * vector*matrix and scalar products).
 	 * @param a first operand
 	 * @param b second operand
-	 * @return [matrix|scalar] dot product of a and b 
+	 * @return [matrix|scalar] times product of a and b 
 	 */
-	function dot(a, b) {
-		// let's duck type the two vectors so we can accept generic arrays too	
-		if(
-			((typeof(b.rows) === "undefined") && (a.length === b.length)) ||
-			((a.rows === b.rows) && (a.cols === 1 && b.cols === 1))
-		) {
-			return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
-		}
-		else return matrices.dot(a, b);
+	function times(a, b) {
+		if(typeof(b) === "number") return create(a.length, a.map((cur) => cur * b));
+		else return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
 	}
 
 	/**
@@ -231,13 +225,21 @@
 		if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
 		if(a.length == 2) a = [a[0], a[1], 0];
 		if(b.length == 2) b = [b[0], b[1], 0];
-		return vec3(
+		return create.vec3(
 			a[1]*b[2] - a[2]*b[1],
 			a[2]*b[0] - a[0]*b[2],
 			a[0]*b[1] - a[1]*b[0]
 		);
 	}
 
+	/**
+	 * Creates a new vector. Note that vectors created directly with this function
+	 * will not have convenience aliases, meaning they're initialized faster but...
+	 * ah, less convenient.
+	 * @param len [2...4] vector length
+	 * @param args values in any combination of array-like and scalar values
+	 * @return vector
+	 */
 	function create(len, args) {
 		let params = [].slice.apply(args);
 		let vals = [];
@@ -249,7 +251,7 @@
 		let vec = matrices.create(len,1,vals);
 		// define vector-specific methods
 		vec.homogenous = homogenous.bind(null, vec);
-		vec.dot = dot.bind(null, vec);
+		vec.times = times.bind(null, vec);
 		vec.normalize = normalize.bind(null, vec);
 		vec.lerp = lerp.bind(null, vec);
 		vec.cubic = cubic.bind(null, vec);
@@ -258,32 +260,62 @@
 		return vec;
 	}
 
-	function vec2() {
+	/**
+	 * Creates a 2d vector.
+	 */
+	create.vec2 = function() {
 		let vec = create(2, arguments);
 		vec.cross = cross.bind(null, vec);
 		defineAliases(vec);
 		return vec;
 	}
 
-	function vec3() {
+	/**
+	 * Creates a 3d vector.
+	 */
+	create.vec3 = function() {
 		let vec = create(3, arguments);
 		vec.cross = cross.bind(null, vec);
 		defineAliases(vec);
 		return vec;
 	}
 
-	function vec4() {
+	/**
+	 * Creates a 4d vector.
+	 */
+	create.vec4 = function() {
 		let vec = create(4, arguments);
 		defineAliases(vec);
 		return vec;
 	}
 
+	/**
+	 * @namespace vectrix.vectors
+	 */
 	if(typeof("module") !== undefined) {
+		/**
+		 * @alias vectrix.vectors
+		 */
 		module.exports = {
 			create:create,
-			vec2:vec2,
-			vec3:vec3,
-			vec4:vec4,
+			vec2:create.vec2,
+			vec3:create.vec3,
+			vec4:create.vec4,
+			homogenous:homogenous,
+			times:times,
+			normalize:normalize,
+			lerp:lerp,
+			cubic:cubic,
+			angle:angle,
+			distance:distance,
+			/**
+			 * @alias distance
+			 */
+			dist:distance,
+			/**
+			 * @alias normalize
+			 */
+			norm:normalize,
 			// the following are exported mainly for testing purposes
 			aliases2d:aliases2d,
 			aliases3d:aliases3d,

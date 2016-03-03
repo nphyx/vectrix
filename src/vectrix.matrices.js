@@ -19,7 +19,7 @@
 	 * @param b second matrix
 	 * @return sum matrix
 	 */
-	function add(a, b) {
+	function plus(a, b) {
 		if(typeof(b) === "number") return create(a.rows,a.cols, a.map((cur) => cur + b));
 		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
 			return create(a.rows, a.cols, a.map((cur, i) => cur + b[i]))
@@ -33,7 +33,7 @@
 	 * @param b second matrix
 	 * @return difference matrix
 	 */
-	function sub(a, b) {
+	function minus(a, b) {
 		if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur - b));
 		else if((a.rows === b.rows) && (a.cols === b.cols)) return create(a.rows, a.cols, a.map((cur, i) => cur - b[i]));
 		else return undefined;
@@ -118,8 +118,8 @@
 		matrix.cols = cols;
 		matrix.rows = rows;
 		if(vals.length) matrix.set(vals);
-		matrix.add = add.bind(null, matrix);
-		matrix.sub = sub.bind(null, matrix);
+		matrix.plus = plus.bind(null, matrix);
+		matrix.minus = minus.bind(null, matrix);
 		matrix.dot = dot.bind(null, matrix);
 		matrix.col = col.bind(null, matrix);
 		matrix.row = row.bind(null, matrix);
@@ -168,7 +168,6 @@
 		return this(3, 3, [cos(r),0,sin(r), 0,1,0, -sin(r),sin(r),-cos(r)]);
 	}
 
-
 	/**
 	 * Creates a rotation matrix around absolute Z axis of angle r.
 	 * @param r angle as a radian
@@ -190,8 +189,8 @@
 	if(typeof("module") !== "undefined") {
 		module.exports = {
 			create:create,
-			add:add,
-			sub:sub,
+			plus:plus,
+			minus:minus,
 			dot:dot
 		}
 	}
