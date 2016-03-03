@@ -1,5 +1,6 @@
 "use strict";
 var gulp = require("gulp");
+var exec = require("child_process").exec;
 var mocha = require("gulp-mocha");
 var istanbul = require("gulp-istanbul");
 var isparta = require("isparta");
@@ -10,6 +11,14 @@ gulp.task("default", function() {
 	return gulp.src(["src/*js"])
 	.pipe(babel())
 	.pipe(gulp.dest("dist"));
+});
+
+gulp.task("doc", function(cb) {
+	exec("jsdox --templateDir docs/templates --output docs src/*.js", function(err, stdout, stderr) {
+		console.log(stderr);
+		console.log(stdout);
+		cb(err);
+	});
 });
 
 gulp.task("test", function() {
