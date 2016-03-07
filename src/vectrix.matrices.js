@@ -1,9 +1,4 @@
 /**
-Matrices
-========
-
-Usage
------
 Require the module:
 ```javascript
 const matrices = require("vectrix.matrices.js");
