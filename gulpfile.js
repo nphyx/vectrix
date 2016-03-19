@@ -24,6 +24,7 @@ gulp.task("doc", function(cb) {
 gulp.task("test", function() {
 	return gulp.src(["test/*.js"])
 	.pipe(mocha({
+		bail:true,
 		compilers: {
 			js:babelRegister
 		}
@@ -32,12 +33,18 @@ gulp.task("test", function() {
 
 gulp.task("test:vectors", function() {
 	return gulp.src(["test/vectrix.vectors.test.js"])
-	.pipe(mocha());
+	.pipe(mocha({
+		bail:true,
+		compilers: {
+			js:babelRegister
+		}
+	}));
 });
 
 gulp.task("test:matrices", function() {
 	return gulp.src(["test/vectrix.matrices.test.js"])
 	.pipe(mocha({
+		bail:true,
 		compilers: {
 			js:babelRegister 
 		}
@@ -47,6 +54,7 @@ gulp.task("test:matrices", function() {
 gulp.task("test:quaternions", function() {
 	return gulp.src(["test/vectrix.quaternions.test.js"])
 	.pipe(mocha({
+		bail:true,
 		compilers: {
 			js:babelRegister
 		}
