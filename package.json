@@ -1,8 +1,8 @@
 {
-  "name": "@nphyx/jsmatrix",
+  "name": "@nphyx/vectrix",
   "version": "0.0.1",
-  "repository": "https://github.com/nphyx/jsmatrix",
-  "description": "A functional matrix math library for javascript",
+  "repository": "https://github.com/nphyx/vectrix",
+  "description": "A functional/OO matrix math library for javascript",
   "author": "Justen Robertson <nphyxx@gmail.com>",
   "main": "",
   "scripts": {
@@ -10,19 +10,19 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "babel": "^5.8.23",
-    "babel-runtime": "^5.8.20",
+    "babel-core": "^6.0.0",
+    "babel-loader": "^6.0.0",
+    "babel-preset-es2015": "^6.0.0",
     "gulp": "^3.9.0",
-    "gulp-babel": "^5.2.1",
+    "gulp-babel": "^6.0.0",
     "gulp-istanbul": "^0.10.0",
     "gulp-istanbul-enforcer": "^1.0.3",
-    "gulp-mocha": "^2.1.3",
+    "gulp-mocha": "^2.2.0",
     "gulp-replace": "^0.5.4",
     "isparta": "^3.0.4",
     "jsdox": "^0.4.9",
     "jshint": "*",
     "mocha": "*",
-    "mocha-babel": "^3.0.3",
     "should": "*"
   },
   "jshintConfig": {
@@ -52,5 +52,6 @@
       "afterEach": false
     }
   },
+	"babel":{"presets": ["es2015"]},
   "license": "MIT"
 }

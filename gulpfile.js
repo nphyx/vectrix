@@ -1,11 +1,11 @@
 "use strict";
 var gulp = require("gulp");
+var babel = require("gulp-babel");
+var babelRegister = require("babel-core/register");
 var exec = require("child_process").exec;
 var mocha = require("gulp-mocha");
 var istanbul = require("gulp-istanbul");
 var isparta = require("isparta");
-var babel = require("gulp-babel");
-var mochaBabel = require("mocha-babel");
 
 gulp.task("default", function() {
 	return gulp.src(["src/*js"])
@@ -25,25 +25,21 @@ gulp.task("test", function() {
 	return gulp.src(["test/*.js"])
 	.pipe(mocha({
 		compilers: {
-			js: mochaBabel
+			js:babelRegister
 		}
-	}))
+	}));
 });
 
 gulp.task("test:vectors", function() {
 	return gulp.src(["test/vectrix.vectors.test.js"])
-	.pipe(mocha({
-		compilers: {
-			js: mochaBabel
-		}
-	}))
+	.pipe(mocha());
 });
 
 gulp.task("test:matrices", function() {
 	return gulp.src(["test/vectrix.matrices.test.js"])
 	.pipe(mocha({
 		compilers: {
-			js: mochaBabel
+			js:babelRegister 
 		}
 	}))
 });
@@ -52,7 +48,7 @@ gulp.task("test:quaternions", function() {
 	return gulp.src(["test/vectrix.quaternions.test.js"])
 	.pipe(mocha({
 		compilers: {
-			js: mochaBabel
+			js:babelRegister
 		}
 	}))
 });
@@ -68,7 +64,7 @@ gulp.task("test:coverage", function(cb) {
 		gulp.src(["test/*.js"])
 		.pipe(mocha({
 			compilers: {
-				js: mochaBabel
+				js:babelRegister
 			}
 		}))
 		.pipe(mocha())
