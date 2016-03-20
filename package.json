@@ -5,10 +5,7 @@
   "description": "A functional/OO matrix math library for javascript",
   "author": "Justen Robertson <nphyxx@gmail.com>",
   "main": "",
-  "scripts": {
-    "doc": "jsdoc -c doc/conf.json -d doc"
-  },
-  "dependencies": {},
+	"dependencies": {},
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-loader": "^6.0.0",
