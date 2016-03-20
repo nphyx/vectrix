@@ -1,5 +1,6 @@
 /**
 The vectors module contains functions and objects related to 2d, 3d, and 4d vectors.
+
 Vectors are composed from columnar matrices, so they support all the methods that
 [[vectrix.matrices|matrices]] do.
 
@@ -10,6 +11,7 @@ const vec2 = vectors.create.vec2;
 const vec3 = vectors.create.vec3;
 const vec4 = vectors.create.vec4;
 ```
+
 
 You can construct them with vec2, vec3, and vec4, passing zero, one or N arguments
 where N is the vector size. Do whatever is convenient.
@@ -22,6 +24,13 @@ let third = vec2(17,4); // or just pass the components as arguments
 third.toArray(); // [14,4] 
 let fourth = vec3(1,2,3); // and so on with 3d and 4d vectors
 fourth.toArray(); // [1,2,3]
+```
+
+Vector functions will operate on any array-like object, returning a plain Float32Array when the result is another vector. Creating vector objects is somewhat expensive, so when you're doing a lot of operations and performance really counts, use the functions for calculations and then use the vector factories on your final result.
+```javascript
+const lerp = vectors.lerp;
+let res = lerp([0.1, 0.3], [0.3, 0.7], .5); // Float32Array(0.2, 0.5)
+create.vec2(res); // vec2(0.2,0.5);
 ```
 
 Vectors are composed from columnar matrices, so they can do the things that matrices
