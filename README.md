@@ -1,7 +1,6 @@
 Vectrix
 =======
-A new library for working with matrix and vector math in javascript, frontend and backend.
-This is an alpha build, and not yet feature complete.
+Vectrix is a library for doing the kinds of vector math used in games and simple simulations (for complex simulation, don't use javascript!). Compared to other similar libs, it sacrifices a small amount of memory and performance for expressiveness and simplicity.
 
 Usage
 =====
@@ -9,6 +8,7 @@ Vectrix supports commonjs modules:
 ```javascript
 const matrices = require("vectrix.matrices.js");
 const vectors = require("vectrix.vectors.js");
+const quaternions = require("vectrix.quaternions.js");
 ```
 
 Create vectors:
@@ -25,10 +25,12 @@ let trans = matrices.create.translation(xyz); // a translation matrix
 let rotX = matrices.create.rotateX(3.24); // a rotation matrix
 ```
 
-Do stuff with them:
+Vectrix supports OO and functional styles:
 ```javascript
 // add something to xy
 xy.plus([7,3]).toArray(); // [7,4]
+// alternatively,
+plus(xy, [7,3]); // Float32Array(7,4)
 // check out these aliases, and by the way, add didn't mutate it!
 xy.yx; // vec2(1,0);
 // find the dot product of two vectors
@@ -39,6 +41,7 @@ xy.lerp([4,5],0.3); // vec2(1.2000000476837158, 2.200000047683716)
 rotX.dot(xyz); // vec3(-3.6859018802642822,-3.3784799575805664,11)
 // other stuff
 ```
+When performance really matters, use the functional style. When you need it to be easier to reason about and manipulate, the object oriented style is there to help.
 
 [See the wiki for complete documentation](https://github.com/nphyx/vectrix/wiki)
 
@@ -56,14 +59,12 @@ gulp
 
 Testing
 -------
-You'll need to manually clone in babel-mocha to run tests because the author has removed
-it from NPM. I'll work on switching to a different method for test running at some point.
-Besides that problem, here's how you run tests:
 ```bash
 npm install --only=dev .
 gulp test # test all modules
 gulp test:vectors # only test vectors
 gulp test:matrices # only test matrices
+gulp test:quaterions # only test quaternions 
 gulp test:coverage # run a coverage test with istanbul, lcov reports go in /coverage
 ```
 
