@@ -195,10 +195,12 @@ function permutations(list) {
  * @private
  */
 function getAlias(i) {
+	/* jshint validthis:true */
 	return this[i];
 }
 
 /**
+ * Generic function wrapper for vector combo aliases (e.g. vector.xy)
  * @private
  */
 function getAliasCombo(factory, combo) {
@@ -207,6 +209,7 @@ function getAliasCombo(factory, combo) {
 }
 
 /**
+ * Defines vector aliases for a vector based on its length.
  * @private
  */
 function defineAliases(vec) {
@@ -245,6 +248,26 @@ function defineAliases(vec) {
 	}
 }
 
+/**
+ * Turns a vector function into a method by wrapping its result in a create()
+ * statement.
+ * @param {vector} vector
+ * @param {function} method
+ * @private
+ */
+function asMethod(method, vector) {
+	return function() {
+		let res = method.apply(null, [vector].concat(Array.prototype.slice.apply(arguments)));
+		if(!(res instanceof Float32Array)) return res;
+		switch(res.length) {
+			case 2: return create.vec2(res);
+			case 3: return create.vec3(res);
+			case 4: return create.vec4(res);
+			default: return create(res.length, res);
+		}
+	}
+}
+
 /*
  * End ugly code for generating aliases.
  */
@@ -258,7 +281,8 @@ function defineAliases(vec) {
  * @return {matrix}
  */
 function homogenous(a) {
-	return matrices.create(a.length+1,1,a.toArray().concat(1));
+	return Float32Array.from(Array.prototype.concat.call(Array.prototype.slice.call(a), [1]));
+	//return matrices.create(a.length+1,1,a.toArray().concat(1));
 }
 
 /**
@@ -275,7 +299,7 @@ function homogenous(a) {
 function normalize(a) {
 	let sqrt = Math.sqrt;
 	let sum = a.map((cur) => cur*cur).reduce((prev, cur) => prev+cur, 0);
-	return create(a.length, a.map((cur) => cur*1/sqrt(sum)));
+	return a.map((cur) => cur*1/sqrt(sum));
 }
 
 /**
@@ -287,7 +311,7 @@ function normalize(a) {
  * @return {vector}
  */
 function lerp(a, b, t) {
-	return create(a.length, a.map((cur, i) => a[i]+t*(b[i]-a[i])));
+	return a.map((cur, i) => a[i]+t*(b[i]-a[i]));
 }
 
 /**
@@ -309,7 +333,7 @@ function cubic(a, b, c, d, t) {
 			f1 = 3 * t * inv2,
 			f2 = 3 * fs * inv,
 			f3 = fs * t;
-	return create(a.length, a.map((cur, i) => a[i]*f0 + b[i]*f1 + c[i]*f2 + d[i]*f3));	
+	return a.map((cur, i) => a[i]*f0 + b[i]*f1 + c[i]*f2 + d[i]*f3);	
 }
 
 /**
@@ -322,7 +346,7 @@ function cubic(a, b, c, d, t) {
 function angle(a, b) {
 	let anorm = normalize(a);
 	let bnorm = normalize(b);
-	var cos = anorm.times(bnorm);
+	var cos = times(anorm, bnorm);
 	return cos < 1.0?Math.acos(cos):0;
 }
 
@@ -348,7 +372,7 @@ function distance(a, b) {
  * @return {matrix|float} product of a and b 
  */
 function times(a, b) {
-	if(typeof(b) === "number") return create(a.length, a.map((cur) => cur * b));
+	if(typeof(b) === "number") return a.map((cur) => cur * b);
 	else return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
 }
 
@@ -364,7 +388,7 @@ function cross(a, b) {
 	if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
 	if(a.length == 2) a = [a[0], a[1], 0];
 	if(b.length == 2) b = [b[0], b[1], 0];
-	return create.vec3(
+	return Float32Array.of(
 		a[1]*b[2] - a[2]*b[1],
 		a[2]*b[0] - a[0]*b[2],
 		a[0]*b[1] - a[1]*b[0]
@@ -394,20 +418,20 @@ function vecToString(a) {
  * @return {vector}
  */
 function create(len, args) {
-	let params = [].slice.apply(args);
+	let params = Array.prototype.slice.apply(args);
 	let vals = [];
 	if(params.length === 0) vals = new Array(len).fill(0);
 	else vals = args;
 	let vec = matrices.create(len,1,vals);
 	// define vector-specific methods
-	vec.homogenous = homogenous.bind(null, vec);
-	vec.times = times.bind(null, vec);
-	vec.normalize = normalize.bind(null, vec);
-	vec.lerp = lerp.bind(null, vec);
-	vec.cubic = cubic.bind(null, vec);
-	vec.angle = angle.bind(null, vec);
-	vec.distance = distance.bind(null, vec);
-	vec.toString = vecToString.bind(null, vec);
+	vec.homogenous = asMethod(homogenous, vec);
+	vec.times = asMethod(times, vec);
+	vec.normalize = asMethod(normalize, vec);
+	vec.lerp = asMethod(lerp, vec);
+	vec.cubic = asMethod(cubic, vec);
+	vec.angle = asMethod(angle, vec);
+	vec.distance = asMethod(distance, vec);
+	vec.toString = asMethod(vecToString, vec);
 	return vec;
 }
 
@@ -418,7 +442,7 @@ function create(len, args) {
  */
 create.vec2 = function() {
 	let vec = create(2, arguments);
-	vec.cross = cross.bind(null, vec);
+	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
 	return vec;
 }
@@ -430,7 +454,7 @@ create.vec2 = function() {
  */
 create.vec3 = function() {
 	let vec = create(3, arguments);
-	vec.cross = cross.bind(null, vec);
+	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
 	return vec;
 }
@@ -454,6 +478,7 @@ if(typeof("module") !== undefined) {
 		vec4:create.vec4,
 		homogenous:homogenous,
 		times:times,
+		cross:cross,
 		normalize:normalize,
 		lerp:lerp,
 		cubic:cubic,
