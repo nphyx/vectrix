@@ -4,8 +4,7 @@ var babel = require("gulp-babel");
 var babelRegister = require("babel-core/register");
 var exec = require("child_process").exec;
 var mocha = require("gulp-mocha");
-var istanbul = require("gulp-istanbul");
-var isparta = require("isparta");
+var istanbul = require("gulp-babel-istanbul");
 
 gulp.task("default", function() {
 	return gulp.src(["src/*js"])
@@ -63,21 +62,17 @@ gulp.task("test:quaternions", function() {
 
 gulp.task("test:coverage", function(cb) {
 	gulp.src(["src/*js"])
-	.pipe(istanbul({
-		instrumenter:isparta.Instrumenter,
-		includeUntested:true
-	}))
+	.pipe(istanbul())
 	.pipe(istanbul.hookRequire())
 	.on("finish", function() {
 		gulp.src(["test/*.js"])
 		.pipe(mocha({
 			compilers: {
+				bail:true,
 				js:babelRegister
 			}
 		}))
-		.pipe(mocha())
 		.pipe(istanbul.writeReports())
-		.pipe(istanbul.enforceThresholds({ thresholds: { global: 90 }}))
 		.on("end", cb)
 	});
 });
