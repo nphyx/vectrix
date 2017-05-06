@@ -346,6 +346,54 @@ export function cubic(a, b, c, d, t) {
 }
 
 /**
+ * Vector product for matching vector types. Accepts vectors or generic arrays, 
+ * or defaults up to the matrix product if the vectors don't match (which supports
+ * vector*matrix and scalar products).
+ * @function times
+ * @param {vector} a first operand
+ * @param {vector|float} b second operand
+ * @param {vector} out out vector 
+ * @return {matrix|float} product of a and b 
+ */
+export var times = (() => {
+	let i = 0|0, len = 0|0, scratch = new Float32Array(4), sum = 0.0;
+	return function(a, b, out) {
+		out = out||new Float32Array(a.length);
+		if(typeof(b) === "number") {
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] * b;
+			}
+			return out;
+		}
+		else {
+			len = a.length;
+			for(i = 0; i < len; ++i) {
+				scratch[i] = a[i] * b[i];
+			}
+			sum = 0.0;
+			for(i = 0; i < len; ++i) {
+				sum += scratch[i];
+			}
+			return (out = sum);
+		}
+	}
+})();
+
+/**
+ * Mutating version of [times](#times).
+ * Note that non-scalar values of b will mutate a to a scalar, be careful!
+ *
+ * @function times
+ * @param {vector} a first operand
+ * @param {vector|float} b second operand
+ * @return {matrix|float} product of a and b 
+ */
+export function mut_times(a, b) {
+	return times(a, b, a);
+}
+
+
+/**
  * Find the angle between two vectors in radians.
  * @function angle
  * @param {vector} a first operand
@@ -359,6 +407,7 @@ export function angle(a, b) {
 	return cos < 1.0?Math.acos(cos):0;
 }
 
+
 /**
  * Find the distance between two vectors.
  * @function distance
@@ -371,19 +420,6 @@ export function distance(a, b) {
 	return sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
 }
 
-/**
- * Vector times product for matching vector types. Accepts vectors or generic arrays, 
- * or defaults up to the matrix times product if the vectors don't match (which supports
- * vector*matrix and scalar products).
- * @function times
- * @param {vector} a first operand
- * @param {vector|float} b second operand
- * @return {matrix|float} product of a and b 
- */
-export function times(a, b) {
-	if(typeof(b) === "number") return a.map((cur) => cur * b);
-	else return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
-}
 
 /**
  * Vector cross products are technically only defined for 3D, but 2D can be
@@ -419,8 +455,8 @@ export function cross(a, b) {
  * @return {vector} clamped vector
  */
 export var clamp = (() => {
+	let i = 0|0, len = 0|0;
 	return function(a, minv, maxv, out) {
-		let i = 0|0, len = 0|0;
 		out = out||new Float32Array(a.length);
 		for(i = 0, len = a.length; i < len; ++i) {
 			out[i] = max(min(a[i], maxv), minv);
