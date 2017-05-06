@@ -408,8 +408,8 @@ export function cross(a, b) {
 /**
  * Restricts vector values to a range.
  * @example
- * let v = vectors.create.vec3([-5,100, -22]).toString(); // vec2(-5,100)
- * clamp(v, -10, 10); // vec2(-5, 10, -10);
+ * let v = vectors.create.vec3([-5,100, -22]); // vec3(-5,100, -22)
+ * clamp(v, -10, 10); // vec3(-5, 10, -10);
  *
  * @function clamp
  * @param {vector} a vector to clamp
@@ -431,6 +431,7 @@ export var clamp = (() => {
 
 /**
  * Mutating version of [clamp](#clamp).
+ * @return {vector} the mutated vector
  */
 export function mut_clamp(a, min, max) {
 	return clamp(a, min, max, a);
