@@ -1,15 +1,52 @@
 "use strict";
-var gulp = require("gulp");
-var babel = require("gulp-babel");
-var babelRegister = require("babel-core/register");
-var exec = require("child_process").exec;
-var mocha = require("gulp-mocha");
-var istanbul = require("gulp-babel-istanbul");
+const gulp = require("gulp");
+const babel = require("gulp-babel");
+const babelRegister = require("babel-core/register");
+const exec = require("child_process").exec;
+const mocha = require("gulp-mocha");
+const istanbul = require("gulp-babel-istanbul");
+const path = require("path");
+const webpack = require("webpack");
+const del = require("del");
+const webpackConfigFrontend = {
+	entry:path.resolve(__dirname, "dist/node/vectrix.js"),
+	devtool:"source-map",
+	output:{
+		filename:"vectrix.bundle.js",
+		path:path.resolve(__dirname, "dist/web/")
+	},
+	plugins:[
+		new webpack.optimize.DedupePlugin(),
+		new webpack.optimize.UglifyJsPlugin()
+  ]
+}
 
-gulp.task("default", function() {
+gulp.task("default", ["doc", "webpack"]);
+
+gulp.task("clean", function() {
+	return del(["target/*", "dist/*"]);
+});
+
+gulp.task("babel", ["clean"], function() {
 	return gulp.src(["src/*js"])
 	.pipe(babel())
-	.pipe(gulp.dest("dist"));
+	.pipe(gulp.dest("dist/node"));
+});
+
+/* jshint unused:false */
+gulp.task("webpack", ["babel", "test"], function(callback) {
+	webpack(webpackConfigFrontend, function(err, stats) {
+		if(err) console.log(err);
+		/*
+		if (err) throw new gutil.PluginError('webpack', err);
+
+		gutil.log('[webpack]', stats.toString({
+			colors: true,
+			progress: true
+		}));
+		*/
+		callback();
+	});
 });
 
 gulp.task("doc", function(cb) {

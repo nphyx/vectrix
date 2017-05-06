@@ -1,3 +1,7 @@
+/**
+Master module for vectrix. See individual modules for documentation.
+@module vectrix
+ */
 "use strict";
 import * as _v from "./vectrix.vectors";
 import * as _m from "./vectrix.matrices";
