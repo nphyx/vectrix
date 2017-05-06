@@ -1,5 +1,5 @@
 "use strict";
-const matrices = require("../src/vectrix.matrices.js");
+import * as matrices from "../src/vectrix.matrices.js";
 require("./helpers/should.nearly.js");
 
 describe("an arbitrary matrix", function() {
@@ -200,4 +200,3 @@ describe("rotation matrices", function() {
 		xzy.dot(a).toArray().should.be.nearly([0,1,0], 1.0e-16);
 	});
 });
-

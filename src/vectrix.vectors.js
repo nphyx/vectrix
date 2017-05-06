@@ -122,7 +122,7 @@ are available. vec2s only support x/y because r/g is not useful.
 @module vectrix/vectors
 */
 "use strict";
-const matrices = require("./vectrix.matrices.js");
+import * as matrices from "./vectrix.matrices";
 
 /*
  * All of the below is a dumb, slow workaround for the fact
@@ -143,22 +143,22 @@ const matrices = require("./vectrix.matrices.js");
  * of time making this happen.
  */
 
-let aliasCombos2d = [];
-let aliasCombos3d = [];
-let aliasCombos4d = [];
+export const aliasCombos2d = [];
+export const aliasCombos3d = [];
+export const aliasCombos4d = [];
 
-let aliases2d = [
+export const aliases2d = [
 	{names:["x"], i:0},
 	{names:["y"],i:1}
 ];
 
-let aliases3d = [
+export const aliases3d = [
 	{names:["x","r"],i:0},
 	{names:["y","g"],i:1},
 	{names:["z","b"],i:2}
 ];
 
-let aliases4d = [
+export const aliases4d = [
 	{names:["w", "a"],i:3}
 ].concat(aliases3d);
 
@@ -289,7 +289,7 @@ function asMethod(method, vector) {
  * @param {vector} a input vector
  * @return {matrix}
  */
-function homogenous(a) {
+export function homogenous(a) {
 	return Float32Array.from(Array.prototype.concat.call(Array.prototype.slice.call(a), [1]));
 	//return matrices.create(a.length+1,1,a.toArray().concat(1));
 }
@@ -305,7 +305,7 @@ function homogenous(a) {
  * @param {vector} a vector to normalize
  * @return {vector}
  */
-function normalize(a) {
+export function normalize(a) {
 	let sqrt = Math.sqrt;
 	let sum = a.map((cur) => cur*cur).reduce((prev, cur) => prev+cur, 0);
 	return a.map((cur) => cur*1/sqrt(sum));
@@ -319,7 +319,7 @@ function normalize(a) {
  * @param {float} t interval
  * @return {vector}
  */
-function lerp(a, b, t) {
+export function lerp(a, b, t) {
 	return a.map((cur, i) => a[i]+t*(b[i]-a[i]));
 }
 
@@ -333,7 +333,7 @@ function lerp(a, b, t) {
  * @param {float} t interval
  * @return {vector}
  */
-function cubic(a, b, c, d, t) {
+export function cubic(a, b, c, d, t) {
 	/* parametric cubic bezier, faster than dec */
 	let inv = 1-t,
 			inv2 = inv*inv,
@@ -352,7 +352,7 @@ function cubic(a, b, c, d, t) {
  * @param {vector} b second operand
  * @return {vector}
  */
-function angle(a, b) {
+export function angle(a, b) {
 	let anorm = normalize(a);
 	let bnorm = normalize(b);
 	var cos = times(anorm, bnorm);
@@ -366,7 +366,7 @@ function angle(a, b) {
  * @param {vector} b second operand
  * @return {float} distance
  */
-function distance(a, b) {
+export function distance(a, b) {
 	let dist = a.map((cur, i) => b[i] - a[i]);
 	return Math.sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
 }
@@ -380,7 +380,7 @@ function distance(a, b) {
  * @param {vector|float} b second operand
  * @return {matrix|float} product of a and b 
  */
-function times(a, b) {
+export function times(a, b) {
 	if(typeof(b) === "number") return a.map((cur) => cur * b);
 	else return a.map((cur, i) => cur * b[i]).reduce((prev, cur) => prev+cur, 0);
 }
@@ -393,7 +393,7 @@ function times(a, b) {
  * @param {vector|float} b second operand
  * @return {vector} cross product
  */
-function cross(a, b) {
+export function cross(a, b) {
 	if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
 	if(a.length == 2) a = [a[0], a[1], 0];
 	if(b.length == 2) b = [b[0], b[1], 0];
@@ -412,7 +412,7 @@ function cross(a, b) {
  * @param {vector} a input vector
  * @return {string}
  */
-function vecToString(a) {
+export function vecToString(a) {
 	let strings = a.toArray().map((cur) => cur.toFixed(2));
 	return "vec"+a.length+"("+strings.join(", ")+")";
 }
@@ -426,7 +426,7 @@ function vecToString(a) {
  * @param {mixed} args values in any combination of array-like and scalar values
  * @return {vector}
  */
-function create(len, args) {
+export function create(len, args) {
 	let params = Array.prototype.slice.apply(args);
 	let vals = [];
 	if(params.length === 0) vals = new Array(len).fill(0);
@@ -449,7 +449,7 @@ function create(len, args) {
  * @function create.vec2
  * @return {vector}
  */
-create.vec2 = function() {
+export const vec2 = create.vec2 = function() {
 	let vec = create(2, arguments);
 	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
@@ -461,7 +461,7 @@ create.vec2 = function() {
  * @function create.vec3
  * @return {vector}
  */
-create.vec3 = function() {
+export const vec3 = create.vec3 = function() {
 	let vec = create(3, arguments);
 	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
@@ -473,32 +473,8 @@ create.vec3 = function() {
  * @function create.vec4
  * @return {vector}
  */
-create.vec4 = function() {
+export const vec4 = create.vec4 = function() {
 	let vec = create(4, arguments);
 	defineAliases(vec);
 	return vec;
-}
-
-if(typeof("module") !== undefined) {
-	module.exports = {
-		create:create,
-		vec2:create.vec2,
-		vec3:create.vec3,
-		vec4:create.vec4,
-		homogenous:homogenous,
-		times:times,
-		cross:cross,
-		normalize:normalize,
-		lerp:lerp,
-		cubic:cubic,
-		angle:angle,
-		distance:distance,
-		vecToString:vecToString,
-		aliases2d:aliases2d,
-		aliases3d:aliases3d,
-		aliases4d:aliases4d,
-		aliasCombos2d:aliasCombos2d,
-		aliasCombos3d:aliasCombos3d,
-		aliasCombos4d:aliasCombos4d,
-	}
 }

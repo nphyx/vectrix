@@ -21,7 +21,7 @@ q.zw; // [2.1, 1.0]
 @module vectrix/quaternions
 */
 
-const vectors = require("./vectrix.vectors.js");
+import * as vectors from "./vectrix.vectors";
 const vecNrm = vectors.normalize;
 
 /**
@@ -139,7 +139,7 @@ function invert(a, normalize = true) {
  * @param {quaternion} a quaternion to stringify
  * @return {string}
  */
-function quatToString(a) {
+export function quatToString(a) {
 	let strings = a.toArray().map((cur) => cur.toFixed(2));
 	return "quaternion("+strings.join(", ")+")";
 }
@@ -166,7 +166,7 @@ function normalize(a) {
  * @param {array(4)} vals [x,y,z,w] (default [0,0,0,1] = identity quaternion)
  * @return {quaternion}
  */
-function create() {
+export function create() {
 	let args = [].slice.apply(arguments);
 	if(args.length === 0) args = [0,0,0,1];
 	let q = vectors.create(4, args);
@@ -228,10 +228,4 @@ create.fromAxisAngle = function(axis, angle) {
 	    a[2] * Math.sin(angle/2),
 	    Math.cos(angle/2)
 	]);
-}
-
-
-if(typeof(module.exports) !== "undefined") {
-	module.exports.create = create;
-	module.exports.quatToString = quatToString;
 }

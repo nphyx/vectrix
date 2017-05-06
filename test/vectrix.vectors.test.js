@@ -1,8 +1,9 @@
 "use strict";
 require("should");
-const vectors = require("../src/vectrix.vectors.js");
-const matrices = require("../src/vectrix.matrices.js");
 require("./helpers/should.nearly.js");
+import * as vectors from "../src/vectrix.vectors";
+import * as matrices from "../src/vectrix.matrices";
+
 describe("vector functions", function() {
 	it("should all exist", function() {
 		vectors.create.should.be.a.Function();

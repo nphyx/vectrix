@@ -1,5 +1,5 @@
 "use strict";
-const quats = require("../src/vectrix.quaternions.js");
+import * as quats from "../src/vectrix.quaternions";
 require("./helpers/should.nearly.js");
 describe("quaternions", function() {
 	it("should create a quaternion when given valid arguments", function() {

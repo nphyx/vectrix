@@ -86,7 +86,7 @@ var flatten = function(input) {
  * @param {matrix} b second matrix
  * @return {matrix}
  */
-function plus(a, b) {
+export function plus(a, b) {
 	if(typeof(b) === "number") return create(a.rows,a.cols, a.map((cur) => cur + b));
 	else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
 		return create(a.rows, a.cols, a.map((cur, i) => cur + b[i]))
@@ -103,7 +103,7 @@ function plus(a, b) {
  * @param {matrix} b second matrix
  * @return {matrix}
  */
-function minus(a, b) {
+export function minus(a, b) {
 	if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur - b));
 	else if((a.rows === b.rows) && (a.cols === b.cols)) return create(a.rows, a.cols, a.map((cur, i) => cur - b[i]));
 	else return undefined;
@@ -118,7 +118,7 @@ function minus(a, b) {
  * @param {matrix} b second matrix
  * @return {matrix}
  */
-function dot(a, b) {
+export function dot(a, b) {
 	if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur*b));
 	else if(a.cols === b.rows) {
 		let out = [];
@@ -147,7 +147,7 @@ function dot(a, b) {
  * @param {n} column number (zero indexed)
  * @return {matrix} a single column from the source matrix
  */
-function col(a, n) {
+export function col(a, n) {
 	let out = new Float32Array(a.rows);
 	for(let i = 0; i < a.rows; i++) {
 		out[i] = a[i*a.cols+n]
@@ -164,7 +164,7 @@ function col(a, n) {
  * @param {n} row number (zero indexed)
  * @return {matrix} a single row from the source matrix
  */
-function row(a, n) {
+export function row(a, n) {
 	let out = new Float32Array(a.cols);
 	for(let i = 0; i < a.cols; i++) {
 		out[i] = a[a.cols*n+i]
@@ -180,7 +180,7 @@ function row(a, n) {
  * @param {matrix} a
  * @return {array} values as flat array
  */
-function toArray(a) {
+export function toArray(a) {
 	return [].slice.apply(a);
 }
 
@@ -192,7 +192,7 @@ function toArray(a) {
  * @param {matrix} a
  * @return {string}
  */
-function matToString(a) {
+export function matToString(a) {
 	let string = "matrix(",
 			c = a.cols,
 			r = a.rows,
@@ -231,7 +231,7 @@ const sin = Math.sin;
  * @param {array-like} values matrix values as an array
  * @return {matrix}
  */
-function create(rows, cols, values = []) {
+export function create(rows, cols, values = []) {
 	var matrix = new Float32Array(cols * rows);	
 	var vals = flatten(values);
 	matrix.cols = cols;
@@ -315,14 +315,4 @@ create.rotateX = function(r) {
  */
 create.rotateZ = function(r) {
 	return this(3, 3, [1,0,0, 0,cos(r),-sin(r), 0,sin(r),cos(r)]);
-}
-
-if(typeof("module") !== "undefined") {
-	module.exports = {
-		create:create,
-		plus:plus,
-		minus:minus,
-		dot:dot,
-		matToString:matToString
-	}
 }
