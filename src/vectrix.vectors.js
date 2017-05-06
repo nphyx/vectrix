@@ -123,6 +123,7 @@ are available. vec2s only support x/y because r/g is not useful.
 */
 "use strict";
 import * as matrices from "./vectrix.matrices";
+let {sqrt, min, max} = Math;
 
 /*
  * All of the below is a dumb, slow workaround for the fact
@@ -306,7 +307,6 @@ export function homogenous(a) {
  * @return {vector}
  */
 export function normalize(a) {
-	let sqrt = Math.sqrt;
 	let sum = a.map((cur) => cur*cur).reduce((prev, cur) => prev+cur, 0);
 	return a.map((cur) => cur*1/sqrt(sum));
 }
@@ -368,7 +368,7 @@ export function angle(a, b) {
  */
 export function distance(a, b) {
 	let dist = a.map((cur, i) => b[i] - a[i]);
-	return Math.sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
+	return sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
 }
 
 /**
@@ -402,6 +402,38 @@ export function cross(a, b) {
 		a[2]*b[0] - a[0]*b[2],
 		a[0]*b[1] - a[1]*b[0]
 	);
+}
+
+
+/**
+ * Restricts vector values to a range.
+ * @example
+ * let v = vectors.create.vec3([-5,100, -22]).toString(); // vec2(-5,100)
+ * clamp(v, -10, 10); // vec2(-5, 10, -10);
+ *
+ * @function clamp
+ * @param {vector} a vector to clamp
+ * @param {float} minv minimum value
+ * @param {float} maxv maximum value
+ * @param {vector} out output vector
+ * @return {vector} clamped vector
+ */
+export var clamp = (() => {
+	return function(a, minv, maxv, out) {
+		let i = 0|0, len = 0|0;
+		out = out||new Float32Array(a.length);
+		for(i = 0, len = a.length; i < len; ++i) {
+			out[i] = max(min(a[i], maxv), minv);
+		}
+		return out;
+	}
+})();
+
+/**
+ * Mutating version of [clamp](#clamp).
+ */
+export function mut_clamp(a, min, max) {
+	return clamp(a, min, max, a);
 }
 
 /**
@@ -478,3 +510,4 @@ export const vec4 = create.vec4 = function() {
 	defineAliases(vec);
 	return vec;
 }
+

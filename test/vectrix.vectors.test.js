@@ -15,6 +15,7 @@ describe("vector functions", function() {
 		vectors.times.should.be.a.Function();
 		vectors.normalize.should.be.a.Function();
 		vectors.lerp.should.be.a.Function();
+		vectors.clamp.should.be.a.Function();
 		vectors.cubic.should.be.a.Function();
 		vectors.angle.should.be.a.Function();
 		vectors.distance.should.be.a.Function();
@@ -100,6 +101,12 @@ describe("vector functions", function() {
 		distance(Float32Array.of(0,0), Float32Array.of(3,4)).should.eql(5);
 		distance(Float32Array.of(0,0,0), Float32Array.of(0,6,8)).should.eql(10);
 		distance(Float32Array.of(0,0,0,0), Float32Array.of(0,0,8,15)).should.eql(17);
+	});
+	it("should clamp vectors", function() {
+		let clamp = vectors.clamp;
+		clamp(Float32Array.of(-5,10), 1, 10).should.eql(Float32Array.of(1,10));
+		clamp(Float32Array.of(-5,10,15), 1, 10).should.eql(Float32Array.of(1,10,10));
+		clamp(Float32Array.of(-20,-5,10,15), 1, 10).should.eql(Float32Array.of(1,1,10,10));
 	});
 	it("should produce a string representation of a vector", function() {
 		let toString = vectors.vecToString;
