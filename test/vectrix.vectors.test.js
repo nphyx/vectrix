@@ -102,8 +102,11 @@ describe("vector functions", function() {
 		distance(Float32Array.of(0,0,0), Float32Array.of(0,6,8)).should.eql(10);
 		distance(Float32Array.of(0,0,0,0), Float32Array.of(0,0,8,15)).should.eql(17);
 	});
-	it("should clamp vectors", function() {
+	it("should clamp vectors and scalars", function() {
 		let clamp = vectors.clamp;
+		clamp(10, 1, 5).should.eql(5);
+		clamp(-10, 1, 5).should.eql(1);
+		clamp(4, 1, 5).should.eql(4);
 		clamp(Float32Array.of(-5,10), 1, 10).should.eql(Float32Array.of(1,10));
 		clamp(Float32Array.of(-5,10,15), 1, 10).should.eql(Float32Array.of(1,10,10));
 		clamp(Float32Array.of(-20,-5,10,15), 1, 10).should.eql(Float32Array.of(1,1,10,10));

@@ -442,13 +442,15 @@ export function cross(a, b) {
 
 
 /**
- * Restricts vector values to a range.
+ * Restricts scalar or vector values to a range.
  * @example
  * let v = vectors.create.vec3([-5,100, -22]); // vec3(-5,100, -22)
  * clamp(v, -10, 10); // vec3(-5, 10, -10);
+ * let s = 23.0;
+ * clamp(s, 0, 5); // 5
  *
  * @function clamp
- * @param {vector} a vector to clamp
+ * @param {vector} a vector or scalar to clamp
  * @param {float} minv minimum value
  * @param {float} maxv maximum value
  * @param {vector} out output vector
@@ -456,10 +458,14 @@ export function cross(a, b) {
  */
 export var clamp = (() => {
 	let i = 0|0, len = 0|0;
+	function clamp_s(a, minv, maxv) {
+		return max(min(a, maxv), minv)
+	}
 	return function(a, minv, maxv, out) {
+		if(typeof(a) === "number") return clamp_s(a, minv, maxv);
 		out = out||new Float32Array(a.length);
 		for(i = 0, len = a.length; i < len; ++i) {
-			out[i] = max(min(a[i], maxv), minv);
+			out[i] = clamp(a[i], minv, maxv);
 		}
 		return out;
 	}
