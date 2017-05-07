@@ -552,8 +552,8 @@ export function vecToString(a) {
  * @function create
  * @param {int} len [2...4] vector length
  * @param {mixed} args values in any combination of array-like and scalar values
- * @param {ArrayBuffer} buffer an array buffer to create the vector in
- * @param {offset} offset an array buffer to create the vector in
+ * @param {ArrayBuffer} buffer (optional) an array buffer to create the vector on 
+ * @param {offset} offset (optional) offset for the buffer, ignored if buffer is not supplied 
  * @return {vector}
  */
 export function create() {
