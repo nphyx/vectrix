@@ -539,18 +539,49 @@ export function vecToString(a) {
 /**  
  * Creates a new vector. Note that vectors created directly with this function
  * will not have convenience aliases, meaning they're initialized faster but...
- * ah, less convenient.
+ * ah, less convenient. Can be supplied with an optional arraybuffer view and optional
+ * offset to that view as the last or last two parameters.
+ * @example
+ * create(2); // vector[0,0]
+ * create(2, 3.3, 3.2); // vector[3.3,3.2]
+ * create(2, [3.3, 3.2]); // vector[3.3,3.2] from an array
+ * create(2, 3.3, 3.2, new ArrayBuffer(2*4)); // vector[3.3,3.2] as view of ArrayBuffer
+ * create(2, 3.3, 3.2, new ArrayBuffer(3*4), 4); // vector[3.3,3.2] as view of ArrayBuffer, offset by 4 bytes
+ * create(2, [3.3, 3.2], new ArrayBuffer(3*4), 4); // vector[3.3,3.2] as view of ArrayBuffer, offset by 4 bytes, from an array
+ *
  * @function create
  * @param {int} len [2...4] vector length
  * @param {mixed} args values in any combination of array-like and scalar values
+ * @param {ArrayBuffer} buffer an array buffer to create the vector in
+ * @param {offset} offset an array buffer to create the vector in
  * @return {vector}
  */
-export function create(len, args) {
-	let params = Array.prototype.slice.apply(args);
-	let vals = [];
-	if(params.length === 0) vals = new Array(len).fill(0);
-	else vals = args;
-	let vec = matrices.create(len,1,vals);
+export function create() {
+	if(arguments.length === 0) throw new Error("vectors.create requires at least one argument");
+	let params = Array.prototype.slice.apply(arguments), len = params.length, buffer, vec, offset = 0;
+	if(len === 1) { // just create an empty array of length params[0]
+		vec = matrices.create(params[0],1);
+		vec.fill(0);
+	}
+	else {
+		if(params[len-1] instanceof ArrayBuffer) { // supplied buffer, no offset
+			buffer = params[len-1];
+			offset = 0;
+			params = params.slice(0, len-1);
+		}
+		else if(params[len-2] instanceof ArrayBuffer) { // supplied buffer + offset
+			buffer = params[len-2];
+			offset = params[len-1];
+			params = params.slice(0, len-2);
+		}
+		if(params.length === 1) {
+			vec = matrices.create(params[0], 1, undefined, buffer, offset);
+			vec.fill(0);
+		}
+		else {
+			vec = matrices.create(params[0], 1, params.slice(1), buffer, offset);
+		}
+	}
 	// define vector-specific methods
 	vec.homogenous = asMethod(homogenous, vec);
 	vec.times = asMethod(times, vec);
@@ -564,37 +595,36 @@ export function create(len, args) {
 }
 
 /**
- * Creates a 2d vector.
+ * Creates a 2d vector. Curried version of [create](#create) with first argument presupplied.
  * @function create.vec2
  * @return {vector}
  */
 export const vec2 = create.vec2 = function() {
-	let vec = create(2, arguments);
+	let vec = create.apply(null, [2].concat(Array.prototype.slice.apply(arguments)));
 	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
 	return vec;
 }
 
 /** 
- * Creates a 3d vector.
+ * Creates a 3d vector. Curried version of [create](#create) with first argument presupplied.
  * @function create.vec3
  * @return {vector}
  */
 export const vec3 = create.vec3 = function() {
-	let vec = create(3, arguments);
+	let vec = create.apply(null, [3].concat(Array.prototype.slice.apply(arguments)));
 	vec.cross = asMethod(cross, vec);
 	defineAliases(vec);
 	return vec;
 }
 
 /** 
- * Creates a 4d vector.
+ * Creates a 4d vector. Curried version of [create](#create) with first argument presupplied.
  * @function create.vec4
  * @return {vector}
  */
 export const vec4 = create.vec4 = function() {
-	let vec = create(4, arguments);
+	let vec = create.apply(null, [4].concat(Array.prototype.slice.apply(arguments)));
 	defineAliases(vec);
 	return vec;
 }
-

@@ -131,12 +131,6 @@ describe("vector functions", function() {
 		mag(Float32Array.of(2, 3, 5)).should.be.approximately(6.16441400297, 1.0e-6);
 		mag(Float32Array.of(2, 3, 4, 5)).should.be.approximately(7.34846922835, 1.0e-6);
 	});
-	it("should produce a string representation of a vector", function() {
-		let toString = vectors.vecToString;
-		toString(vectors.vec2([13,1])).should.eql("vec2(13.00, 1.00)");
-		toString(vectors.vec3([13,1,22])).should.eql("vec3(13.00, 1.00, 22.00)");
-		toString(vectors.vec4([13,1,22,123])).should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
-	});
 });
 
 describe("a 2d vector", function() {
@@ -154,6 +148,24 @@ describe("a 2d vector", function() {
 	it("should create a populated vector when given two arguments", function() {
 		let vec = vectors.vec2(3,4);
 		vec.toArray().should.eql([3,4]);
+	});
+	it("should create vectors with pre-supplied buffers", function() {
+		let buffer, vec;
+		buffer = new ArrayBuffer(2*4);
+		vec = vectors.vec2(buffer); // with only buffer 
+		vec.toArray().should.eql([0,0]);
+		vec.buffer.should.eql(buffer);
+		buffer = new ArrayBuffer(2*4+4);
+		vec = vectors.vec2(buffer, 4); // with buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(2*4+4);
+		vec.byteLength.should.eql(2*4);
+		vec.toArray().should.eql([0,0]);
+		vec = vectors.vec2([2.3, 0.1], buffer, 4); // with values, buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(2*4+4);
+		vec.byteLength.should.eql(2*4);
+		vec.toArray().should.be.nearly([2.3,0.1], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3)}).should.throwError();
@@ -211,6 +223,24 @@ describe("a 3d vector", function() {
 		vec.toArray().should.eql([4,3,6]);
 		vec = vectors.vec3(matrices.create(1,2, [0,5]), 3);
 		vec.toArray().should.eql([0,5,3]);
+	});
+	it("should create vectors with pre-supplied buffers", function() {
+		let buffer, vec;
+		buffer = new ArrayBuffer(3*4);
+		vec = vectors.vec3(buffer); // with only buffer 
+		vec.toArray().should.eql([0,0,0]);
+		vec.buffer.should.eql(buffer);
+		buffer = new ArrayBuffer(3*4+4);
+		vec = vectors.vec3(buffer, 4); // with buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(3*4+4);
+		vec.byteLength.should.eql(3*4);
+		vec.toArray().should.eql([0,0,0]);
+		vec = vectors.vec3([3.3, 0.1, 2.2], buffer, 4); // with values, buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(3*4+4);
+		vec.byteLength.should.eql(3*4);
+		vec.toArray().should.be.nearly([3.3,0.1,2.2], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4)}).should.throwError();
@@ -282,6 +312,24 @@ describe("a 4d vector", function() {
 		let vecb = vectors.vec3([9,7,2]);
 		vec = vectors.vec4(vecb.x, vecb.y, vecb.yz);
 		vec.toArray().should.eql([9,7,7,2]);
+	});
+	it("should create vectors with pre-supplied buffers", function() {
+		let buffer, vec;
+		buffer = new ArrayBuffer(4*4);
+		vec = vectors.vec4(buffer); // with only buffer 
+		vec.toArray().should.eql([0,0,0,0]);
+		vec.buffer.should.eql(buffer);
+		buffer = new ArrayBuffer(4*4+4);
+		vec = vectors.vec4(buffer, 4); // with buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(4*4+4);
+		vec.byteLength.should.eql(4*4);
+		vec.toArray().should.eql([0,0,0,0]);
+		vec = vectors.vec4([4.3, 0.1, 2.2, 4.4], buffer, 4); // with values, buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(4*4+4);
+		vec.byteLength.should.eql(4*4);
+		vec.toArray().should.be.nearly([4.3,0.1,2.2,4.4], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4, 5)}).should.throwError();
@@ -369,6 +417,10 @@ describe("vector methods", function() {
 		vec4.cubic([9,7,3,1],[4,4,5,6],[10,8,1,19],0.5).should.have.property("xyzw");
 	});
 	it("should produce representations of themselves", function() {
+		let toString = vectors.vecToString;
+		toString(vectors.vec2([13,1])).should.eql("vec2(13.00, 1.00)");
+		toString(vectors.vec3([13,1,22])).should.eql("vec3(13.00, 1.00, 22.00)");
+		toString(vectors.vec4([13,1,22,123])).should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
 		vectors.vec2([13,1]).toString().should.eql("vec2(13.00, 1.00)");
 		vectors.vec3([13,1,22]).toString().should.eql("vec3(13.00, 1.00, 22.00)");
 		vectors.vec4([13,1,22,123]).toString().should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
