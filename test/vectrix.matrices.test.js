@@ -22,6 +22,14 @@ describe("an arbitrary matrix", function() {
 		mat.length.should.eql(9);
 		mat.forEach((val) => val.should.eql(0));
 	});
+	it("should create a matrix using a buffer", function() {
+		let values = [0,1,2,3,4,5];
+		let buffer = new ArrayBuffer(2*3*4+4); // 2 rows x 3 cols x 4 bytes per entry + 1 offset
+		let mat = matrices.create(2, 3, values, buffer, 4);
+		mat.buffer.should.eql(buffer);
+		[].slice.apply(mat).should.eql(values);
+	});
+
 	it("should produce an array representation of itself", function() {
 		let mat = matrices.create(2,2,[0,1,2,3]);
 		mat.toArray().should.eql([0,1,2,3]);

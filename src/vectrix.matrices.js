@@ -289,8 +289,14 @@ const sin = Math.sin;
  * @param {array-like} values matrix values as an array
  * @return {matrix}
  */
-export function create(rows, cols, values = []) {
-	var matrix = new Float32Array(cols * rows);	
+export function create(rows, cols, values = [], buffer = undefined, offset = 0) {
+	var matrix;
+	if(buffer) {
+		matrix = new Float32Array(buffer, offset, cols * rows);
+	}
+	else {
+		matrix = new Float32Array(cols * rows);
+	}
 	var vals = flatten(values);
 	matrix.cols = cols;
 	matrix.rows = rows;
