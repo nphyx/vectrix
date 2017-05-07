@@ -13,9 +13,13 @@ describe("vector functions", function() {
 		vectors.cross.should.be.a.Function();
 		vectors.homogenous.should.be.a.Function();
 		vectors.times.should.be.a.Function();
+		vectors.mut_times.should.be.a.Function();
 		vectors.normalize.should.be.a.Function();
 		vectors.lerp.should.be.a.Function();
 		vectors.clamp.should.be.a.Function();
+		vectors.mut_clamp.should.be.a.Function();
+		vectors.magnitude.should.be.a.Function();
+		vectors.mut_copy.should.be.a.Function();
 		vectors.cubic.should.be.a.Function();
 		vectors.angle.should.be.a.Function();
 		vectors.distance.should.be.a.Function();
@@ -110,6 +114,22 @@ describe("vector functions", function() {
 		clamp(Float32Array.of(-5,10), 1, 10).should.eql(Float32Array.of(1,10));
 		clamp(Float32Array.of(-5,10,15), 1, 10).should.eql(Float32Array.of(1,10,10));
 		clamp(Float32Array.of(-20,-5,10,15), 1, 10).should.eql(Float32Array.of(1,1,10,10));
+	});
+	it("should copy values", function() {
+		let copy = vectors.mut_copy;
+		let v2 = Float32Array.of(2, 2);
+		let v3 = Float32Array.of(3, 3, 3);
+		let v4 = Float32Array.of(4, 4, 4, 4);
+		copy(v3, v2).should.eql(Float32Array.of(2,2,3));
+		copy(v2, v4).should.eql(Float32Array.of(4,4));
+		copy(v4, v3).should.eql(Float32Array.of(2,2,3,4));
+		copy(v2, v4).should.eql(Float32Array.of(2,2));
+	});
+	it("should take the magnitude of a vector", function() {
+		let mag = vectors.magnitude;
+		mag(Float32Array.of(3,4)).should.eql(5);
+		mag(Float32Array.of(2, 3, 5)).should.be.approximately(6.16441400297, 1.0e-6);
+		mag(Float32Array.of(2, 3, 4, 5)).should.be.approximately(7.34846922835, 1.0e-6);
 	});
 	it("should produce a string representation of a vector", function() {
 		let toString = vectors.vecToString;

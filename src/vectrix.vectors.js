@@ -472,12 +472,56 @@ export var clamp = (() => {
 })();
 
 /**
+ * Copies values from second operand into first.
+ * @example
+ * let v = vec3(1,2,3);
+ * let v2 = vec2(31,6);
+ * copy(v, v2); // vec3(31,6,3);
+ *
+ * @mutates
+ * @function mut_copy
+ * @param {vector} a vector to copy into
+ * @param {vector} b vector to copy from
+ * @return {vector} a, with copied values
+ */
+export const mut_copy = (() => {
+	let i = 0|0, alen = 0|0, blen = 0|0;
+	return function mut_copy(a, b) {
+		for(i = 0, alen = a.length, blen = b.length;
+			i < alen && i < blen; ++i) {
+			a[i] = b[i];
+		}
+		return a;
+	}
+})();
+
+/**
  * Mutating version of [clamp](#clamp).
  * @return {vector} the mutated vector
  */
 export function mut_clamp(a, min, max) {
 	return clamp(a, min, max, a);
 }
+
+/**
+ * Calculate the magnitude of a vector.
+ * @example
+ * magnitude(vec3(2,3,6)); // ~6.16
+ *
+ * @function magnitude
+ * @param {vector} a operand
+ * @return {float} magnitude of a
+ */
+export const magnitude = (() => {
+	let scratch = 0.0, i = 0|0, len = 0|0;
+	return function(a) {
+		scratch = 0.0;
+		for(i = 0, len = a.length; i < len; ++i) {
+			scratch += a[i] * a[i];	
+		}
+		return sqrt(scratch);
+	}
+})();
 
 /**
  * Get a string representation of a vector.
