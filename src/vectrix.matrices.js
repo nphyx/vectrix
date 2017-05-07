@@ -82,16 +82,45 @@ var flatten = function(input) {
  * @example
  * plus(matrix, anotherMatrix); // function
  * matrix.plus(anotherMatrix); // method
+ * @function plus
  * @param {matrix} a first matrix
  * @param {matrix} b second matrix
+ * @param {matrix} out out value (optional)
  * @return {matrix}
  */
-export function plus(a, b) {
-	if(typeof(b) === "number") return create(a.rows,a.cols, a.map((cur) => cur + b));
-	else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
-		return create(a.rows, a.cols, a.map((cur, i) => cur + b[i]))
+export const plus = (function() {
+	let i = 0|0, len = 0|0;
+	return function plus(a, b, out) {
+		if(typeof(b) === "number") {
+			out = out||create(a.rows, a.cols);
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] + b;
+			}
+			return out;
+		}
+
+		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
+			out = out||create(a.rows, a.cols);
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] + b[i]
+			}
+			return out;
+		}
+		else return undefined;
 	}
-	else return undefined;
+})();
+
+/**
+ * Mutating version of [plus](#plus).
+ *
+ * @function mut_plus
+ * @param {matrix} a first matrix
+ * @param {matrix} b second matrix
+ * @param {matrix} out out value (optional)
+ * @return {matrix}
+ */
+export function mut_plus(a, b) {
+	return plus(a, b, a);
 }
 
 /**
@@ -103,10 +132,39 @@ export function plus(a, b) {
  * @param {matrix} b second matrix
  * @return {matrix}
  */
-export function minus(a, b) {
-	if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur - b));
-	else if((a.rows === b.rows) && (a.cols === b.cols)) return create(a.rows, a.cols, a.map((cur, i) => cur - b[i]));
-	else return undefined;
+export const minus = (function() {
+	let i = 0|0, len = 0|0;
+	return function plus(a, b, out) {
+		if(typeof(b) === "number") {
+			out = out||create(a.rows, a.cols);
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] - b;
+			}
+			return out;
+		}
+
+		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
+			out = out||create(a.rows, a.cols);
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] - b[i]
+			}
+			return out;
+		}
+		else return undefined;
+	}
+})();
+
+/**
+ * Mutating version of [minus](#plus).
+ *
+ * @function mut_minus
+ * @param {matrix} a first matrix
+ * @param {matrix} b second matrix
+ * @param {matrix} out out value (optional)
+ * @return {matrix}
+ */
+export function mut_minus(a, b) {
+	return minus(a, b, a);
 }
 
 /**
