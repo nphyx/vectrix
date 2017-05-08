@@ -517,7 +517,7 @@ export const magnitude = (() => {
 	return function magnitude(a) {
 		scratch = 0.0;
 		for(i = 0, len = a.length; i < len; ++i) {
-			scratch += a[i] * a[i];	
+			scratch = scratch + a[i] * a[i];	
 		}
 		return sqrt(scratch);
 	}
