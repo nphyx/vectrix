@@ -514,7 +514,7 @@ export function mut_clamp(a, min, max) {
  */
 export const magnitude = (() => {
 	let scratch = 0.0, i = 0|0, len = 0|0;
-	return function(a) {
+	return function magnitude(a) {
 		scratch = 0.0;
 		for(i = 0, len = a.length; i < len; ++i) {
 			scratch += a[i] * a[i];	

@@ -134,7 +134,7 @@ export function mut_plus(a, b) {
  */
 export const minus = (function() {
 	let i = 0|0, len = 0|0;
-	return function plus(a, b, out) {
+	return function minus(a, b, out) {
 		if(typeof(b) === "number") {
 			out = out||create(a.rows, a.cols);
 			for(i = 0, len = a.length; i < len; ++i) {
@@ -155,7 +155,7 @@ export const minus = (function() {
 })();
 
 /**
- * Mutating version of [minus](#plus).
+ * Mutating version of [minus](#minus).
  *
  * @function mut_minus
  * @param {matrix} a first matrix
