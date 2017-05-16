@@ -64,20 +64,26 @@ first.col(1); // matrix(1,2,[2,4])
 */
 
 "use strict";
-// frequently used scratch values (!cannot be used with loops containing nested functions that also contain global loops!)
-let ROW_MAX = 10;
-let COL_MAX = 10;
+// set the max size for certain matrix operations, used in creating scratch memory
+const ROW_MAX = 20, COL_MAX = 20;
+const {cos, sin} = Math;
+
 /**
  * Flattens an array. Used for flattening arguments passed to factories. 
- * @private
+ * @function flatten
+ * @param {mixed} a an array, array-like, or object that can be flattened
+ * @return {mixed} flat version of input
  */
-export const flatten = function(input) {
-	if(typeof(input) !== "object") return input;
-	let i = 0, len = input.length, out = [];
-	for(;i < len; ++i) {
-		out = out.concat(flatten(input[i]));
+export function flatten(a) {
+	// cheap array-like check, may not always be reliable
+	if(a instanceof Object && typeof a.length == "number") {
+		let i = 0, len = a.length, out = [];
+		for(;i < len; ++i) {
+			out = out.concat(flatten(a[i]));
+		}
+		return out;
 	}
-	return out;
+	else return a;
 }
 
 /**
@@ -101,7 +107,6 @@ export const plus = (function() {
 			}
 			return out;
 		}
-
 		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
 			out = out||create(a.rows, a.cols);
 			for(i = 0, len = a.length; i < len; ++i) {
@@ -303,9 +308,6 @@ export function matToString(a) {
 	}
 	return string + ")";
 }
-
-const cos = Math.cos;
-const sin = Math.sin;
 
 /*
  * Matrix factories

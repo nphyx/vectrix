@@ -32,6 +32,7 @@ describe("vector functions", function() {
 		let c = Float32Array.of(2,-2,2);
 		cross(a, b).should.eql(Float32Array.of(0,0,-3));
 		cross(a, c).should.eql(Float32Array.of(4,-2,-6));
+		cross(c, a).should.eql(Float32Array.of(-4,2,6));
 		(typeof(cross(a, Float32Array.of(0))) === "undefined").should.be.true();
 		(typeof(cross(a, Float32Array.of(1,2,3,4))) === "undefined").should.be.true();
 	});
@@ -61,6 +62,26 @@ describe("vector functions", function() {
 		times(twodee, twodee).should.eql(5, "should work on two-dimensional vectors");
 		times(fourdee, fourdee).should.eql(7, "should work on a four-dimensional vector");
 		times(vec, scalar).should.eql(Float32Array.of(2,2,2), "should produce a scaled vector when a vector is multiplied by a scalar");
+	});
+	it("should not mutate operands when multiplying", function() {
+		let times = vectors.times;
+		let a = Float32Array.of(2,1,1,1);
+		let b = Float32Array.of(3,4,5,6);
+		times(a,b);
+		a.should.eql(Float32Array.of(2,1,1,1));
+		b.should.eql(Float32Array.of(3,4,5,6));
+	});
+	it("should mutate the first operand only when mutably multiplying an array by a scalar", function() {
+		let mut_times = vectors.mut_times, toArray = matrices.toArray;
+		let a = Float32Array.of(2,1,1,1);
+		let b = Float32Array.of(3,4,5,6);
+		let out = mut_times(a,b);
+		out.should.not.eql(a);
+		a.should.eql(Float32Array.of(2,1,1,1));
+		b.should.eql(Float32Array.of(3,4,5,6));
+		out = mut_times(a, 2);
+		toArray(out).should.eql([4,2,2,2]);
+		out.should.eql(a);
 	});
 	it("should normalize a vector of any length", function() {
 		let normalize = vectors.normalize;
@@ -99,6 +120,7 @@ describe("vector functions", function() {
 		angle(Float32Array.of(1,0), Float32Array.of(0,1)).should.eql(90*Math.PI/180);
 		angle(Float32Array.of(1,1,0), Float32Array.of(0,0,1)).should.eql(90*Math.PI/180);
 		angle(Float32Array.of(1,1,1,0), Float32Array.of(0,0,0,1)).should.eql(90*Math.PI/180);
+		angle(Float32Array.of(0.5,0.5,0.5,0), Float32Array.of(0,0,0,1)).should.eql(90*Math.PI/180);
 	});
 	it("should find the distance between any two like vectors", function() {
 		let distance = vectors.distance;
@@ -107,13 +129,17 @@ describe("vector functions", function() {
 		distance(Float32Array.of(0,0,0,0), Float32Array.of(0,0,8,15)).should.eql(17);
 	});
 	it("should clamp vectors and scalars", function() {
-		let clamp = vectors.clamp;
+		let clamp = vectors.clamp, mut_clamp = vectors.mut_clamp;
 		clamp(10, 1, 5).should.eql(5);
 		clamp(-10, 1, 5).should.eql(1);
 		clamp(4, 1, 5).should.eql(4);
 		clamp(Float32Array.of(-5,10), 1, 10).should.eql(Float32Array.of(1,10));
 		clamp(Float32Array.of(-5,10,15), 1, 10).should.eql(Float32Array.of(1,10,10));
 		clamp(Float32Array.of(-20,-5,10,15), 1, 10).should.eql(Float32Array.of(1,1,10,10));
+		let vec = Float32Array.of(-20,-5,10,15); 
+		let out = mut_clamp(vec, 1, 10);
+		out.should.eql(Float32Array.of(1,1,10,10));
+		out.should.eql(vec);
 	});
 	it("should copy values", function() {
 		let copy = vectors.mut_copy;
@@ -131,8 +157,10 @@ describe("vector functions", function() {
 		mag(Float32Array.of(2, 3, 5)).should.be.approximately(6.16441400297, 1.0e-6);
 		mag(Float32Array.of(2, 3, 4, 5)).should.be.approximately(7.34846922835, 1.0e-6);
 	});
+	it("should throw an error when create is used with no parameters", function() {
+		(function() {vectors.create()}).should.throwError();
+	});
 });
-
 describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
 		let vec = vectors.vec2();
@@ -450,4 +478,3 @@ describe("vector methods", function() {
 		vectors.vec4([13,1,22,123]).toString().should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
 	});
 });
-

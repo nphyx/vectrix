@@ -74,6 +74,25 @@ describe("an arbitrary matrix", function() {
 		mat1.plus(scalar);
 		scalar.should.eql(2);
 	});
+	it("should mutate its first operand during a mutating add", function() {
+		let mut_plus = matrices.mut_plus;
+		let mat1 = matrices.create(2,2,[1,1,1,1]);
+		let mat2 = matrices.create(2,2,[2,2,2,2]);
+		let out1 = mut_plus(mat1, mat2);
+		mat1.should.equal(out1);
+		out1.toArray().should.eql([3,3,3,3]);
+		mat2.toArray().should.eql([2,2,2,2]);
+		let out2 = mut_plus(mat2, mat1);
+		out2.should.eql(mat2);
+		out2.toArray().should.eql([5,5,5,5]);
+		out1.toArray().should.eql([3,3,3,3]);
+		let scalar = 2;
+		out1 = mut_plus(mat1, scalar);
+		mat1.should.equal(out1);
+		mat1.toArray().should.eql([5,5,5,5]);
+		scalar.should.eql(2);
+	});
+
 	it("should subtract like matrices", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
@@ -97,6 +116,24 @@ describe("an arbitrary matrix", function() {
 		out2.toArray().should.eql([-2,-2,-2,-2]);
 		let scalar = 2;
 		mat1.minus(scalar);
+		scalar.should.eql(2);
+	});
+	it("should mutate its first operand during a mutating subtract", function() {
+		let mut_minus = matrices.mut_minus;
+		let mat1 = matrices.create(2,2,[1,1,1,1]);
+		let mat2 = matrices.create(2,2,[2,2,2,2]);
+		let out1 = mut_minus(mat1, mat2);
+		mat1.should.equal(out1);
+		out1.toArray().should.eql([-1,-1,-1,-1]);
+		mat2.toArray().should.eql([2,2,2,2]);
+		let out2 = mut_minus(mat2, mat1);
+		out2.should.eql(mat2);
+		out2.toArray().should.eql([3,3,3,3]);
+		out1.toArray().should.eql([-1,-1,-1,-1]);
+		let scalar = 2;
+		out1 = mut_minus(mat1, scalar);
+		mat1.should.equal(out1);
+		mat1.toArray().should.eql([-3,-3,-3,-3]);
 		scalar.should.eql(2);
 	});
 	it("should reject unlike matrices during add and subtract", function() {
@@ -206,5 +243,14 @@ describe("rotation matrices", function() {
 		zyx.dot(a).toArray().should.be.nearly([1,0,0], 1.0e-16);
 		yzx.dot(a).toArray().should.be.nearly([0,-1,-1], 1.0e-16);
 		xzy.dot(a).toArray().should.be.nearly([0,1,0], 1.0e-16);
+	});
+});
+describe("utility methods", function() {
+	it("should flatten arrays", function() {
+		let flatten = matrices.flatten;
+		flatten(1).should.eql(1);
+		flatten([0,1,2,3,4,5]).should.eql([0,1,2,3,4,5]);
+		flatten([[0,1,2],[3,4,5]]).should.eql([0,1,2,3,4,5]);
+		flatten([[0,[1,2]],[[3,4],5]]).should.eql([0,1,2,3,4,5]);
 	});
 });

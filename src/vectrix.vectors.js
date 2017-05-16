@@ -123,7 +123,7 @@ are available. vec2s only support x/y because r/g is not useful.
 */
 "use strict";
 import * as matrices from "./vectrix.matrices";
-let {sqrt, min, max} = Math;
+let {sqrt, min, max, acos} = Math;
 
 /*
  * All of the below is a dumb, slow workaround for the fact
@@ -283,6 +283,31 @@ function asMethod(method, vector) {
  */
 
 /**
+ * Copies values from second operand into first.
+ * @example
+ * let v = vec3(1,2,3);
+ * let v2 = vec2(31,6);
+ * copy(v, v2); // vec3(31,6,3);
+ *
+ * @mutates
+ * @function mut_copy
+ * @param {vector} a vector to copy into
+ * @param {vector} b vector to copy from
+ * @return {vector} a, with copied values
+ */
+export const mut_copy = (() => {
+	let i = 0|0, alen = 0|0, blen = 0|0;
+	return function mut_copy(a, b) {
+		for(i = 0, alen = a.length, blen = b.length;
+			i < alen && i < blen; ++i) {
+			a[i] = b[i];
+		}
+		return a;
+	}
+})();
+
+
+/**
  * Homogenous coordinates for a vector. Note this does not return
  * a vector because it's not really useful to do so.
  *
@@ -355,11 +380,11 @@ export function cubic(a, b, c, d, t) {
  * @param {vector} out out vector 
  * @return {matrix|float} product of a and b 
  */
-export var times = (() => {
+export var times = (function() {
 	let i = 0|0, len = 0|0, scratch = new Float32Array(4), sum = 0.0;
 	return function(a, b, out) {
 		out = out||new Float32Array(a.length);
-		if(typeof(b) === "number") {
+		if(typeof b === "number") {
 			for(i = 0, len = a.length; i < len; ++i) {
 				out[i] = a[i] * b;
 			}
@@ -380,13 +405,13 @@ export var times = (() => {
 })();
 
 /**
- * Mutating version of [times](#times).
- * Note that non-scalar values of b will mutate a to a scalar, be careful!
+ * Mutating version of [times](#times). Note that a is mutated only when a is a vector
+ * and b is a scalar.
  *
  * @function times
  * @param {vector} a first operand
  * @param {vector|float} b second operand
- * @return {matrix|float} product of a and b 
+ * @return {matrix|float} mutated a, product of a and b 
  */
 export function mut_times(a, b) {
 	return times(a, b, a);
@@ -404,7 +429,7 @@ export function angle(a, b) {
 	let anorm = normalize(a);
 	let bnorm = normalize(b);
 	var cos = times(anorm, bnorm);
-	return cos < 1.0?Math.acos(cos):0;
+	return acos(cos);
 }
 
 
@@ -427,19 +452,23 @@ export function distance(a, b) {
  * @function cross
  * @param {vector} a first operand
  * @param {vector|float} b second operand
- * @return {vector} cross product
+ * @param {vec3} out parameter
+ * @return {Float32Array(3)} cross product
  */
-export function cross(a, b) {
-	if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
-	if(a.length == 2) a = [a[0], a[1], 0];
-	if(b.length == 2) b = [b[0], b[1], 0];
-	return Float32Array.of(
-		a[1]*b[2] - a[2]*b[1],
-		a[2]*b[0] - a[0]*b[2],
-		a[0]*b[1] - a[1]*b[0]
-	);
-}
-
+export const cross = (function() {
+	let scratcha = new Float32Array(3);
+	let scratchb = new Float32Array(3);
+	return function cross(a, b, out) {
+		if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
+		out = out||new Float32Array(3);
+		mut_copy(scratcha.fill(0), a);
+		mut_copy(scratchb.fill(0), b);
+		out[0] = scratcha[1]*scratchb[2] - scratcha[2]*scratchb[1];
+		out[1] = scratcha[2]*scratchb[0] - scratcha[0]*scratchb[2];
+		out[2] = scratcha[0]*scratchb[1] - scratcha[1]*scratchb[0];
+		return out;
+	}
+})();
 
 /**
  * Restricts scalar or vector values to a range.
@@ -468,30 +497,6 @@ export var clamp = (() => {
 			out[i] = clamp(a[i], minv, maxv);
 		}
 		return out;
-	}
-})();
-
-/**
- * Copies values from second operand into first.
- * @example
- * let v = vec3(1,2,3);
- * let v2 = vec2(31,6);
- * copy(v, v2); // vec3(31,6,3);
- *
- * @mutates
- * @function mut_copy
- * @param {vector} a vector to copy into
- * @param {vector} b vector to copy from
- * @return {vector} a, with copied values
- */
-export const mut_copy = (() => {
-	let i = 0|0, alen = 0|0, blen = 0|0;
-	return function mut_copy(a, b) {
-		for(i = 0, alen = a.length, blen = b.length;
-			i < alen && i < blen; ++i) {
-			a[i] = b[i];
-		}
-		return a;
 	}
 })();
 

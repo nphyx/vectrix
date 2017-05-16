@@ -15,6 +15,10 @@ describe("quaternions", function() {
 		quat.toArray().should.eql([0,0,0,1]);
 		quat.buffer.should.eql(buffer);
 		buffer = new ArrayBuffer(4*4+4);
+		quat = quats.create([1.1, 2.2, 3.3, 4.4], buffer); // with buffer and values
+		quat.toArray().should.be.nearly([1.1, 2.2, 3.3, 4.4], 1e-6);
+		quat.buffer.should.eql(buffer);
+		buffer = new ArrayBuffer(4*4+4);
 		quat = quats.create(buffer, 4); // with buffer and offset 
 		quat.buffer.should.eql(buffer);
 		quat.buffer.byteLength.should.eql(4*4+4);
