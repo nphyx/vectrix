@@ -164,12 +164,27 @@ function normalize(a) {
  * @example
  * quaternions.create([0.4, 32.1, 9.0, 1.0]); // quaternion(0.40, 32.10, 9.00, 1.00)
  * @param {array(4)} vals [x,y,z,w] (default [0,0,0,1] = identity quaternion)
+ * @param {ArrayBuffer} buffer (optional) an array buffer to create the vector on 
+ * @param {offset} offset (optional) offset for the buffer, ignored if buffer is not supplied 
+
  * @return {quaternion}
  */
 export function create() {
-	let args = [].slice.apply(arguments);
-	if(args.length === 0) args = [0,0,0,1];
-	let q = vectors.create(4, args);
+	let identity = [0,0,0,1];
+	let params = Array.prototype.slice.apply(arguments), len = params.length;
+	if(len === 0) { // just create an identity quaternion 
+		params = identity;
+	}
+	else {
+		if(params[len-1] instanceof ArrayBuffer) { // supplied buffer, no offset
+			if(len === 1) params = identity.concat(params).concat([0]);
+			else params = params.concat([0]);
+		}
+		else if(params[len-2] instanceof ArrayBuffer) { // supplied buffer + offset
+			if(len === 2) params = identity.concat(params);
+		}
+	}
+	let q = vectors.create.apply(null, [4].concat(params));
 	defineAliases(q);
 	q.slerp = slerp.bind(null, q);
 	q.normalize = normalize.bind(null, q);

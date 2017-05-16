@@ -29,7 +29,6 @@ describe("an arbitrary matrix", function() {
 		mat.buffer.should.eql(buffer);
 		[].slice.apply(mat).should.eql(values);
 	});
-
 	it("should produce an array representation of itself", function() {
 		let mat = matrices.create(2,2,[0,1,2,3]);
 		mat.toArray().should.eql([0,1,2,3]);
@@ -41,16 +40,16 @@ describe("an arbitrary matrix", function() {
 		iden.toString().should.eql("matrix(1.00, 0.00, 0.00, 0.00\n       0.00, 1.00, 0.00, 0.00\n       0.00, 0.00, 1.00, 0.00\n       0.00, 0.00, 0.00, 1.00)");
 	});
 	it("should be able to return its rows", function() {
-		let mat = matrices.create(3,3,[0,1,2,3,4,5,6,7,8]);
-		mat.row(0).should.eql(new Float32Array([0,1,2]));
-		mat.row(1).should.eql(new Float32Array([3,4,5]));
-		mat.row(2).should.eql(new Float32Array([6,7,8]));
+		let create = matrices.create, mat = create(3,3,[0,1,2,3,4,5,6,7,8]);
+		mat.row(0).should.eql(create(1,3,([0,1,2])));
+		mat.row(1).should.eql(create(1,3,([3,4,5])));
+		mat.row(2).should.eql(create(1,3,([6,7,8])));
 	});
 	it("should be able to return its columns", function() {
-		let mat = matrices.create(3,3,[0,1,2,3,4,5,6,7,8]);
-		mat.col(0).should.eql(new Float32Array([0,3,6]));
-		mat.col(1).should.eql(new Float32Array([1,4,7]));
-		mat.col(2).should.eql(new Float32Array([2,5,8]));
+		let create = matrices.create, mat = create(3,3,[0,1,2,3,4,5,6,7,8]);
+		mat.col(0).should.eql(create(3,1,([0,3,6])));
+		mat.col(1).should.eql(create(3,1,([1,4,7])));
+		mat.col(2).should.eql(create(3,1,([2,5,8])));
 	});
 	it("should add like matrices", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
@@ -109,17 +108,18 @@ describe("an arbitrary matrix", function() {
 		(mat1.minus(mat2) === undefined).should.eql(true);
 		(mat1.minus(mat3) === undefined).should.eql(true);
 	});
-	it("should multiply two compatible matrices", function() {
-		let mat1 = matrices.create(1,2,[0, 1]);
-		let mat2 = matrices.create(2,1,[0,1]);
-		let mat3 = matrices.create(2,2,[1,2, 3,4]);
-		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);
-		let mat5 = matrices.create(2,2,[-6,2, -4,-2]);
-		mat1.dot(mat2).toArray().should.eql([1]);
-		mat2.dot(mat1).toArray().should.eql([0,0,0,1]);
-		mat1.dot(mat3).toArray().should.eql([3,4]);
-		mat4.dot(mat5).toArray().should.eql([4,-8, 8,4, 24,-18]); // larger matrices
-		mat1.dot(mat3).dot(mat2).toArray().should.eql([4]); // chaining
+	it("should find the dot product of two compatible matrices", function() {
+		let dot = matrices.dot, 
+			mat1 = matrices.create(1,2,[0,1]),
+			mat2 = matrices.create(2,1,[0,1]),
+			mat3 = matrices.create(2,2,[1,2, 3,4]),
+			mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]),
+			mat5 = matrices.create(2,2,[-6,2, -4,-2]);
+		dot(mat1, mat2).toArray().should.eql([1]);
+		dot(mat2, mat1).toArray().should.eql([0,0,0,1]);
+		dot(mat1, mat3).toArray().should.eql([3,4]);
+		dot(mat4, mat5).toArray().should.eql([4,-8, 8,4, 24,-18]); // larger matrices
+		dot(dot(mat1, mat3), mat2).toArray().should.eql([4]); // chaining
 	});
 	it("should multiply matrices by scalars", function() {
 		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);

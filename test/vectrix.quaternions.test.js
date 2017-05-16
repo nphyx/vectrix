@@ -6,6 +6,25 @@ describe("quaternions", function() {
 		quats.create().toArray().should.eql([0,0,0,1]); // default = identity quaternion
 		quats.create(12,4,8,16).toArray().should.eql([12,4,8,16]);
 		quats.create([12,1,3],3).toArray().should.eql([12,1,3,3]);
+		quats.create(12,1,3,3).toArray().should.eql([12,1,3,3]);
+	});
+	it("should create quaterions with pre-supplied buffers", function() {
+		let buffer, quat;
+		buffer = new ArrayBuffer(4*4);
+		quat = quats.create(buffer); // with only buffer 
+		quat.toArray().should.eql([0,0,0,1]);
+		quat.buffer.should.eql(buffer);
+		buffer = new ArrayBuffer(4*4+4);
+		quat = quats.create(buffer, 4); // with buffer and offset 
+		quat.buffer.should.eql(buffer);
+		quat.buffer.byteLength.should.eql(4*4+4);
+		quat.byteLength.should.eql(4*4);
+		quat.toArray().should.eql([0,0,0,1]);
+		quat = quats.create([2.3, 0.1, 0.3, 12.4], buffer, 4); // with values, buffer and offset 
+		quat.buffer.should.eql(buffer);
+		quat.buffer.byteLength.should.eql(4*4+4);
+		quat.byteLength.should.eql(4*4);
+		quat.toArray().should.be.nearly([2.3,0.1,0.3,12.4], 1e-6);
 	});
 	it("should support x,y,z,w aliases", function() {
 		let q = quats.create([12,4,8,16]);

@@ -64,14 +64,17 @@ first.col(1); // matrix(1,2,[2,4])
 */
 
 "use strict";
+// frequently used scratch values (!cannot be used with loops containing nested functions that also contain global loops!)
+let ROW_MAX = 10;
+let COL_MAX = 10;
 /**
  * Flattens an array. Used for flattening arguments passed to factories. 
  * @private
  */
-var flatten = function(input) {
+export const flatten = function(input) {
 	if(typeof(input) !== "object") return input;
-	let out = [];
-	for(let i = 0, len = input.length; i < len; ++i) {
+	let i = 0, len = input.length, out = [];
+	for(;i < len; ++i) {
 		out = out.concat(flatten(input[i]));
 	}
 	return out;
@@ -142,8 +145,7 @@ export const minus = (function() {
 			}
 			return out;
 		}
-
-		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
+		else if((a.cols === b.cols) && (a.rows === b.rows)) { 
 			out = out||create(a.rows, a.cols);
 			for(i = 0, len = a.length; i < len; ++i) {
 				out[i] = a[i] - b[i]
@@ -168,50 +170,26 @@ export function mut_minus(a, b) {
 }
 
 /**
- * Multiply matrices.
- * @example
- * dot(matrix, anotherMatrix); // function 
- * matrix.dot(anotherMatrix); // method
- * @param {matrix} a first matrix
- * @param {matrix} b second matrix
- * @return {matrix}
- */
-export function dot(a, b) {
-	if(typeof(b) === "number") return create(a.rows, a.cols, a.map((cur) => cur*b));
-	else if(a.cols === b.rows) {
-		let out = [];
-		for(let i = 0; i < a.rows; i++) {
-			let row = a.row(i);
-			for(let n = 0; n < b.cols; n++) {
-				let col = b.col(n);
-				let sum = 0;
-				for(let m = 0; m < col.length; m++) {
-					sum += col[m]*row[m];
-				}
-				out.push(sum);
-			}
-		}
-		return create(a.rows, b.cols, out);
-	}
-	else return undefined;
-}
-
-/**
  * Get a single column from a matrix.
  * @example
  * col(matrix, 2); // function
  * matrix.col(2); // method
  * @param {matrix} a source matrix
  * @param {n} column number (zero indexed)
+ * @param {matrix} out (optional) out parameter, same rows, 1 column
  * @return {matrix} a single column from the source matrix
  */
-export function col(a, n) {
-	let out = new Float32Array(a.rows);
-	for(let i = 0; i < a.rows; i++) {
-		out[i] = a[i*a.cols+n]
+export const col = (function() {
+	let i = 0|0, len = 0|0;
+	return function col(a, n, out) {
+		out = out||create(a.rows, 1);
+		let cols = a.cols;
+		for(i = 0, len = a.rows; i < len; ++i) {
+			out[i] = a[i*cols+n]
+		}
+		return out;
 	}
-	return out;
-}
+})();
 
 /**
  * Get a single row from a matrix.
@@ -220,15 +198,66 @@ export function col(a, n) {
  * matrix.row(2); // method
  * @param {matrix} a source matrix
  * @param {n} row number (zero indexed)
+ * @param {matrix} out (optional) out parameter with rows = a.cols, cols = 1 
  * @return {matrix} a single row from the source matrix
  */
-export function row(a, n) {
-	let out = new Float32Array(a.cols);
-	for(let i = 0; i < a.cols; i++) {
-		out[i] = a[a.cols*n+i]
+export const row = (function() {
+	let i = 0|0, len = 0|0;
+	return function row(a, n, out) {
+		out = out||create(1, a.cols);
+		let cols = a.cols;
+		for(i = 0, len = a.cols; i < len; ++i) {
+			out[i] = a[cols*n+i]
+		}
+		return out;
 	}
-	return out;
-}
+})();
+
+/**
+ * Multiply matrices. Supports up to ROW_MAX x COL_MAX matrices for now.
+ * @example
+ * dot(matrix, anotherMatrix); // function 
+ * matrix.dot(anotherMatrix); // method
+ * @param {matrix} a first matrix
+ * @param {matrix} b second matrix
+ * @param {matrix} out (optional) out parameter 
+ * @return {matrix}
+ */
+export const dot = (function() {
+	let rowscratch = new Float32Array(ROW_MAX), 
+		  colscratch = new Float32Array(COL_MAX);
+	let i = 0|0, len = 0|0, j = 0|0, jl = 0|0, k = 0|0, kl = 0|0, 
+	    m = 0|0, ml = 0|0, sum = 0.0;
+	return function dot(a, b, out) {
+		if(typeof(b) === "number") {
+			out = out||create(a.rows, a.cols);
+			for(i = 0, len = a.length; i < len; ++i) {
+				out[i] = a[i] * b;
+			}
+			return out;
+		}
+		else if(a.cols === b.rows) {
+			jl = a.rows;
+			kl = b.cols;
+			ml = b.rows;
+			out = create(jl, kl);
+			for(j = 0; j < jl; ++j) { // row loop
+				row(a, j, rowscratch);
+				for(k = 0; k < kl; ++k) { // column loop
+					col(b, k, colscratch);
+					sum = 0.0;
+					for(m = 0; m < ml; ++m) { // sum loop
+						sum = sum + rowscratch[m]*colscratch[m];
+					}
+					out[(j * kl) + k] = sum;
+				}
+			}
+			return out;
+		}
+		else return undefined;
+	}
+})();
+
 
 /**
  * Get the basic array representation of a matrix.
@@ -239,7 +268,7 @@ export function row(a, n) {
  * @return {array} values as flat array
  */
 export function toArray(a) {
-	return [].slice.apply(a);
+	return Array.prototype.slice.apply(a);
 }
 
 /**
@@ -284,6 +313,7 @@ const sin = Math.sin;
 
 /**
  * Factory for creating generic matrices.
+ * @function create
  * @param {int} rows matrix rows
  * @param {int} cols matrix columsn
  * @param {array-like} values matrix values as an array
@@ -298,8 +328,8 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
 		matrix = new Float32Array(cols * rows);
 	}
 	var vals = flatten(values);
-	matrix.cols = cols;
 	matrix.rows = rows;
+	matrix.cols = cols;
 	if(vals.length) matrix.set(vals);
 	matrix.plus = plus.bind(null, matrix);
 	matrix.minus = minus.bind(null, matrix);
@@ -328,7 +358,7 @@ create.identity = function(n) {
 		let arr = new Array(n*n);
 		arr.fill(0);
 		for(let i = 0, len = arr.length, j = n+1; i < len; i+=j) arr[i] = 1;
-		return this(n, n, arr);
+		return create(n, n, arr);
 	}
 }
 
@@ -342,8 +372,8 @@ create.identity = function(n) {
  */
 create.translation = function(v) {
 	switch(v.length) {
-		case 2: return this(3, 3, [1,0,  v[0], 0,1,  v[1], 0,0,1]);
-		case 3: return this(4, 4, [1,0,0,v[0], 0,1,0,v[1], 0,0,1,v[2], 0,0,0,1]);
+		case 2: return create(3, 3, [1,0,  v[0], 0,1,  v[1], 0,0,1]);
+		case 3: return create(4, 4, [1,0,0,v[0], 0,1,0,v[1], 0,0,1,v[2], 0,0,0,1]);
 		default: return undefined;
 	}
 }

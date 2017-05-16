@@ -151,11 +151,11 @@ describe("a 2d vector", function() {
 	});
 	it("should create vectors with pre-supplied buffers", function() {
 		let buffer, vec;
-		buffer = new ArrayBuffer(2*4);
+		// 2d vectors
+		buffer = new ArrayBuffer(2*4+4);
 		vec = vectors.vec2(buffer); // with only buffer 
 		vec.toArray().should.eql([0,0]);
 		vec.buffer.should.eql(buffer);
-		buffer = new ArrayBuffer(2*4+4);
 		vec = vectors.vec2(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(2*4+4);
@@ -166,6 +166,30 @@ describe("a 2d vector", function() {
 		vec.buffer.byteLength.should.eql(2*4+4);
 		vec.byteLength.should.eql(2*4);
 		vec.toArray().should.be.nearly([2.3,0.1], 1e-6);
+		// 3d vectors
+		buffer = new ArrayBuffer(3*4+4);
+		vec = vectors.vec3(buffer, 4); // with buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(3*4+4);
+		vec.byteLength.should.eql(3*4);
+		vec.toArray().should.eql([0,0,0]);
+		vec = vectors.vec3([2.3, 0.1, 1.2], buffer, 4); // with values, buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(3*4+4);
+		vec.byteLength.should.eql(3*4);
+		vec.toArray().should.be.nearly([2.3, 0.1, 1.2], 1e-6);
+		// 4d vectors
+		buffer = new ArrayBuffer(4*4+4);
+		vec = vectors.vec4(buffer, 4); // with buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(4*4+4);
+		vec.byteLength.should.eql(4*4);
+		vec.toArray().should.eql([0,0,0,0]);
+		vec = vectors.vec4([2.4, 0.1, 1.2, 6.3], buffer, 4); // with values, buffer and offset 
+		vec.buffer.should.eql(buffer);
+		vec.buffer.byteLength.should.eql(4*4+4);
+		vec.byteLength.should.eql(4*4);
+		vec.toArray().should.be.nearly([2.4, 0.1, 1.2, 6.3], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3)}).should.throwError();
