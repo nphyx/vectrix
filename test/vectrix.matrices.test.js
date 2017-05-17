@@ -203,20 +203,24 @@ describe("an identity matrix", function() {
 		ident.toArray().should.eql([1,0,0, 0,1,0, 0,0,1]);
 		ident = matrices.create.identity(4);
 		ident.toArray().should.eql([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-		ident = matrices.create.identity(5);
-		ident.toArray().should.eql([1,0,0,0,0, 0,1,0,0,0, 0,0,1,0,0, 0,0,0,1,0, 0,0,0,0,1]);
-		ident = matrices.create.identity(6);
-		ident.toArray().should.eql([1,0,0,0,0,0, 0,1,0,0,0,0, 0,0,1,0,0,0,
-		                            0,0,0,1,0,0, 0,0,0,0,1,0, 0,0,0,0,0,1]);
-		ident = matrices.create.identity(7);
-		ident.toArray().should.eql([1,0,0,0,0,0,0, 0,1,0,0,0,0,0, 0,0,1,0,0,0,0, 
-		                            0,0,0,1,0,0,0, 0,0,0,0,1,0,0, 0,0,0,0,0,1,0, 
-																0,0,0,0,0,0,1]);
 		ident = matrices.create.identity(8);
 		ident.toArray().should.eql([1,0,0,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,0,1,0,0,0,0,0, 
 		                            0,0,0,1,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,1,0,0, 
 																0,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,1]);
-		// not gonna test any farther than that, it should be working
+		// with buffer
+		let buffer = new ArrayBuffer(8*8*4);
+		ident = matrices.create.identity(8, buffer);
+		ident.toArray().should.eql([1,0,0,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,0,1,0,0,0,0,0, 
+		                            0,0,0,1,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,1,0,0, 
+																0,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,1]);
+		ident.buffer.should.eql(buffer);
+		// buffer + offset
+		buffer = new ArrayBuffer(8*8*4+4);
+		ident = matrices.create.identity(8, buffer, 4);
+		ident.toArray().should.eql([1,0,0,0,0,0,0,0, 0,1,0,0,0,0,0,0, 0,0,1,0,0,0,0,0, 
+		                            0,0,0,1,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,1,0,0, 
+																0,0,0,0,0,0,1,0, 0,0,0,0,0,0,0,1]);
+		ident.buffer.should.eql(buffer);
 	});
 });
 describe("rotation matrices", function() {

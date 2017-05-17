@@ -333,6 +333,7 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
 	matrix.rows = rows;
 	matrix.cols = cols;
 	if(vals.length) matrix.set(vals);
+	else matrix.fill(0.0); // just in case it was a previously used buffer
 	matrix.plus = plus.bind(null, matrix);
 	matrix.minus = minus.bind(null, matrix);
 	matrix.dot = dot.bind(null, matrix);
@@ -350,19 +351,15 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
  * @param {int} n dimensions of the matrix
  * @return {matrix} identity matrix 
  */
-create.identity = function(n) {
-	// predefine common cases to save needless work
-	switch(n) {
-	case 2: return this(2, 2, [1,0,     0,1]);
-	case 3: return this(3, 3, [1,0,0,   0,1,0,   0,0,1]);
-	case 4: return this(4, 4, [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-	default:
-		let arr = new Array(n*n);
-		arr.fill(0);
-		for(let i = 0, len = arr.length, j = n+1; i < len; i+=j) arr[i] = 1;
-		return create(n, n, arr);
+create.identity = (function() {
+	let i = 0|0, len = 0|0, j = 0|0;
+	return function identity(n, buffer = undefined, offset = 0) {
+		n = n|0;
+		let m = create(n, n, undefined, buffer, offset);
+		for(i = 0|0, len = n*n, j = n+1|0; i < len; i+=j) m[i] = 1.0;
+		return m;
 	}
-}
+})();
 
 /**
  * Creates a translation matrix for a homogenous coordinate in 2D or 3D space. 
