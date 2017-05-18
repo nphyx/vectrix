@@ -284,18 +284,18 @@ describe("rotation matrices", function() {
 	let z = create(3,1,Float32Array.of(0,0,1));
 	it("should produce a rx matrix that rotates 3d vectors around the x axis", function() {
 		dot(rx,x).toArray().should.be.nearly([1,0,0], 1.0e-16);
-		dot(ry,x).toArray().should.be.nearly([0,0,-1], 1.0e-16);
-		dot(rz,x).toArray().should.be.nearly([0,1,0], 1.0e-16);
+		dot(rx,y).toArray().should.be.nearly([0,0,1], 1.0e-16);
+		dot(rx,z).toArray().should.be.nearly([0,-1,0], 1.0e-16);
 	});
 	it("should produce a ry matrix that rotates 3d vectors around the y axis", function() {
 		dot(ry,y).toArray().should.be.nearly([0,1,0], 1.0e-16);
-		dot(rx,y).toArray().should.be.nearly([0,0,1], 1.0e-16);
-		dot(rz,y).toArray().should.be.nearly([-1,0,0], 1.0e-16);
+		dot(ry,x).toArray().should.be.nearly([0,0,-1], 1.0e-16);
+		dot(ry,z).toArray().should.be.nearly([1,0,0], 1.0e-16);
 	});
 	it("should produce a rz matrix that rotates 3d vectors around the z axis", function() {
+		dot(rz,x).toArray().should.be.nearly([0,1,0], 1.0e-16);
+		dot(rz,y).toArray().should.be.nearly([-1,0,0], 1.0e-16);
 		dot(rz,z).toArray().should.be.nearly([0,0,1], 1.0e-16);
-		dot(rx,z).toArray().should.be.nearly([0,-1,0], 1.0e-16);
-		dot(ry,z).toArray().should.be.nearly([1,0,0], 1.0e-16);
 	});
 	it("should produce correct outputs when rotations are chained using dot", function() {
 		let zyx = dot(dot(rz,ry),rx);
