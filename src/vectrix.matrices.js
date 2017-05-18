@@ -285,32 +285,25 @@ export function toArray(a) {
  * @return {string}
  */
 export const toString = (function() {
-	let string = "", c = 0|0, r = 0|0, i = 0|0, n = 0|0, len = 0|0,
-		strings, colWidths, row, strLen = 0|0;
+	let string = "", c = 0|0, r = 0|0, i = 0|0, len = 0|0,
+		strings, colWidth, row;
 	function padLeft(l,s) {
-		return Array(l-s.length+1).join(" ")+s;
+		return ((" ").repeat(l)+s).slice(-l);
 	}
 	function makeStrings(a) {
 		return a.toArray().map((cur) => cur.toFixed(2));
-	}
-	function columnWidths(c) {
-		return new Array(c).fill(0);
 	}
 	return function toString(a, label = "matrix(") {
 		c = a.cols|0;
 		r = a.rows|0;
 		string = label;
 		strings = makeStrings(a);
-		colWidths = columnWidths(c);
+		colWidth = strings.reduce((a, b) => Math.max(a, b.length), 0);
 		for(i = 0; i < r; ++i) {
 			row = strings.slice(i*c, 2*(i+1)*c);
-			for(n = 0; n < c; ++n) {
-				strLen = row[n].length;
-				colWidths[i] = strLen > colWidths[i]?strLen:colWidths[i];
-			}
 		}
 		for(i = 0, len = strings.length; i < len; ++i) {
-			strings[i] = padLeft(colWidths[i%c], strings[i]);
+			strings[i] = padLeft(colWidth, strings[i]);
 			if(i > 0) {
 				if(i % c === 0) string += "\n       ";
 				else string += ", ";

@@ -34,6 +34,8 @@ describe("an arbitrary matrix", function() {
 		mat.toArray().should.eql([0,1,2,3]);
 	});
 	it("should produce a string representation of itself", function() {
+		let rowvec = matrices.create(1,3,[12,1,0]);
+		rowvec.toString().should.eql("matrix(12.00,  1.00,  0.00)");
 		let mat = matrices.create(2,2,[13,1, 1,12]);
 		mat.toString().should.eql("matrix(13.00,  1.00\n        1.00, 12.00)");
 		let iden = matrices.create(4,4,[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
