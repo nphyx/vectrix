@@ -285,7 +285,7 @@ export function toArray(a) {
  * @return {string}
  */
 export const toString = (function() {
-	let string = "", c = 0|0, r = 0|0, i = 0|0, len = 0|0,
+	let label = "matrix(", string = "", c = 0|0, r = 0|0, i = 0|0, len = 0|0,
 		strings, colWidth, row;
 	function padLeft(l,s) {
 		return ((" ").repeat(l)+s).slice(-l);
@@ -293,7 +293,7 @@ export const toString = (function() {
 	function makeStrings(a) {
 		return a.toArray().map((cur) => cur.toFixed(2));
 	}
-	return function toString(a, label = "matrix(") {
+	return function toString(a) {
 		c = a.cols|0;
 		r = a.rows|0;
 		string = label;
