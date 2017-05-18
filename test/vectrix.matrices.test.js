@@ -56,12 +56,17 @@ describe("an arbitrary matrix", function() {
 	it("should add like matrices", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
-		let out = mat1.plus(mat2);
-		out.toArray().should.eql([3,3,3,3]);
+		matrices.plus(mat1, mat2).toArray().should.eql([3,3,3,3]);
+		let out = matrices.create(2,2);
+		// support for out params
+		matrices.plus(mat1,mat2,out).should.equal(out);
 	});
 	it("should add scalars to matrices", function() {
 		let mat1 = matrices.create(3,3).fill(4);
 		mat1.plus(2).toArray().should.eql(new Array(9).fill(6));
+		let out = matrices.create(3,3);
+		// support for out params
+		matrices.plus(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during an add", function() {
 		let plus = matrices.plus;
@@ -99,13 +104,17 @@ describe("an arbitrary matrix", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
-		let out = mat1.minus(mat2);
-		out.toArray().should.eql([-1,-1,-1,-1]);
-		mat3.minus(mat1).toArray().should.eql([0,1,2,3]);
+		matrices.minus(mat1,mat2).toArray().should.eql([-1,-1,-1,-1]);
+		matrices.minus(mat3,mat1).toArray().should.eql([0,1,2,3]);
+		// support for out params
+		let out = matrices.create(2,2);
+		matrices.minus(mat1,mat2,out).should.equal(out);
 	});
 	it("should subtract scalars from matrices", function() {
 		let mat1 = matrices.create(3,3).fill(4);
-		mat1.minus(2).toArray().should.eql(new Array(9).fill(2));
+		matrices.minus(mat1,2).toArray().should.eql(new Array(9).fill(2));
+		let out = matrices.create(3,3);
+		matrices.minus(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during a subtract", function() {
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
@@ -159,6 +168,9 @@ describe("an arbitrary matrix", function() {
 		dot(mat1, mat3).toArray().should.eql([3,4]);
 		dot(mat4, mat5).toArray().should.eql([4,-8, 8,4, 24,-18]); // larger matrices
 		dot(dot(mat1, mat3), mat2).toArray().should.eql([4]); // chaining
+		// support for out params
+		let out = matrices.create(2,2);
+		dot(mat2,mat1,out).should.equal(out);
 	});
 	it("should not mutate operands during a dot operation", function() {
 		let dot = matrices.dot, 
@@ -170,7 +182,10 @@ describe("an arbitrary matrix", function() {
 	});
 	it("should multiply matrices by scalars", function() {
 		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);
-		mat4.dot(3).toArray().should.eql([-6,6, 0,-6, -18,9]);
+		matrices.dot(mat4,3).toArray().should.eql([-6,6, 0,-6, -18,9]);
+		// support for out params
+		let out = matrices.create(3,2);
+		matrices.dot(mat4,3,out).should.equal(out);
 	});
 	it("should reject incompatible matrices", function() {
 		let mat1 = matrices.create(1,3);

@@ -245,7 +245,7 @@ export const dot = (function() {
 			jl = a.rows;
 			kl = b.cols;
 			ml = b.rows;
-			out = create(jl, kl);
+			out = out||create(jl, kl);
 			for(j = 0; j < jl; ++j) { // row loop
 				row(a, j, rowscratch);
 				for(k = 0; k < kl; ++k) { // column loop
