@@ -23,7 +23,7 @@ describe("vector functions", function() {
 		vectors.cubic.should.be.a.Function();
 		vectors.angle.should.be.a.Function();
 		vectors.distance.should.be.a.Function();
-		vectors.vecToString.should.be.a.Function();
+		vectors.toString.should.be.a.Function();
 	});
 	it("should support cross with 2d or 3d vectors", function() {
 		let cross = vectors.cross;
@@ -469,7 +469,7 @@ describe("vector methods", function() {
 		vec4.cubic([9,7,3,1],[4,4,5,6],[10,8,1,19],0.5).should.have.property("xyzw");
 	});
 	it("should produce representations of themselves", function() {
-		let toString = vectors.vecToString;
+		let toString = vectors.toString;
 		toString(vectors.vec2([13,1])).should.eql("vec2(13.00, 1.00)");
 		toString(vectors.vec3([13,1,22])).should.eql("vec3(13.00, 1.00, 22.00)");
 		toString(vectors.vec4([13,1,22,123])).should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
