@@ -284,30 +284,42 @@ export function toArray(a) {
  * @param {matrix} a
  * @return {string}
  */
-export function matToString(a) {
-	let string = "matrix(",
-			c = a.cols,
-			r = a.rows,
-	    padLeft = function(l,s) {return Array(l-s.length+1).join(" ")+s},
-	    strings = a.toArray().map((cur) => cur.toFixed(2)),
-	    colWidths = new Array(c).fill(0);
-	for(let i = 0; i < r; ++i) {
-		let row = strings.slice(i*c, 2*(i+1)*c);
-		for(let n = 0; n < c; ++n) {
-			let strLen = row[n].length;
-			colWidths[i] = strLen > colWidths[i]?strLen:colWidths[i];
-		}
+export const toString = (function() {
+	let string = "", c = 0|0, r = 0|0, i = 0|0, n = 0|0, len = 0|0,
+		strings, colWidths, row, strLen = 0|0;
+	function padLeft(l,s) {
+		return Array(l-s.length+1).join(" ")+s;
 	}
-	for(let i = 0, len = strings.length; i < len; ++i) {
-		strings[i] = padLeft(colWidths[i%c], strings[i]);
-		if(i > 0) {
-			if(i % c === 0) string += "\n       ";
-			else string += ", ";
-		}
-		string += strings[i];
+	function makeStrings(a) {
+		return a.toArray().map((cur) => cur.toFixed(2));
 	}
-	return string + ")";
-}
+	function columnWidths(c) {
+		return new Array(c).fill(0);
+	}
+	return function toString(a, label = "matrix(") {
+		c = a.cols|0;
+		r = a.rows|0;
+		string = label;
+		strings = makeStrings(a);
+		colWidths = columnWidths(c);
+		for(i = 0; i < r; ++i) {
+			row = strings.slice(i*c, 2*(i+1)*c);
+			for(n = 0; n < c; ++n) {
+				strLen = row[n].length;
+				colWidths[i] = strLen > colWidths[i]?strLen:colWidths[i];
+			}
+		}
+		for(i = 0, len = strings.length; i < len; ++i) {
+			strings[i] = padLeft(colWidths[i%c], strings[i]);
+			if(i > 0) {
+				if(i % c === 0) string += "\n       ";
+				else string += ", ";
+			}
+			string += strings[i];
+		}
+		return string + ")";
+	}
+})();
 
 /*
  * Matrix factories
@@ -317,8 +329,10 @@ export function matToString(a) {
  * Factory for creating generic matrices.
  * @function create
  * @param {int} rows matrix rows
- * @param {int} cols matrix columsn
- * @param {array-like} values matrix values as an array
+ * @param {int} cols matrix columns
+ * @param {mixed} values (optional) matrix values as an array-like object
+ * @param {ArrayBuffer} buffer (optional) pre-supplied ArrayBuffer
+ * @param {int} offset (optional) offset for buffer
  * @return {matrix}
  */
 export function create(rows, cols, values = [], buffer = undefined, offset = 0) {
@@ -340,7 +354,7 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
 	matrix.col = col.bind(null, matrix);
 	matrix.row = row.bind(null, matrix);
 	matrix.toArray = toArray.bind(null, matrix);
-	matrix.toString = matToString.bind(null, matrix);
+	matrix.toString = toString.bind(null, matrix);
 	return matrix;
 }
 
@@ -349,6 +363,8 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
  * @example
  * matrices.create.identity(4); // a 4x4 identity matrix
  * @param {int} n dimensions of the matrix
+ * @param {ArrayBuffer} buffer (optional) pre-supplied ArrayBuffer
+ * @param {int} offset (optional) offset for buffer
  * @return {matrix} identity matrix 
  */
 create.identity = (function() {
@@ -369,24 +385,29 @@ create.identity = (function() {
  * @param {vector} v vector representing the distance to translate 
  * @return {matrix} 3x3 or 4x4 matrix
  */
-create.translation = function(v) {
-	switch(v.length) {
-		case 2: return create(3, 3, [1,0,  v[0], 0,1,  v[1], 0,0,1]);
-		case 3: return create(4, 4, [1,0,0,v[0], 0,1,0,v[1], 0,0,1,v[2], 0,0,0,1]);
-		default: return undefined;
+create.translation = (function() {
+	let v2 = Float32Array.from([1.0,0.0,0.0,
+															0.0,1.0,0.0,
+															0.0,0.0,1.0]); 
+	let v3 = Float32Array.from([1.0,0.0,0.0,0.0,
+														  0.0,1.0,0.0,0.0, 
+															0.0,0.0,1.0,0.0, 
+															0.0,0.0,0.0,1.0]);
+	return function translation(v, buffer = undefined, offset = 0) {
+		switch(v.length) {
+			case 2: 
+				v2[2] = v[0];
+				v2[5] = v[1];
+				return create(3, 3, v2, buffer, offset);
+			case 3: 
+				v3[3]  = v[0];
+				v3[7]  = v[1];
+				v3[11] = v[2];
+				return create(4, 4, v3, buffer, offset);
+			default: return undefined;
+		}
 	}
-}
-
-/**
- * Creates a rotation matrix around absolute Y axis of angle r.
- * @example
- * matrices.create.rotateY(1.5708); // 90 degree rotation around Y axis
- * @param {radian} r angle as a radian
- * @return {matrix} 3x3 matrix
- */
-create.rotateY = function(r) {
-	return this(3, 3, [cos(r),0,sin(r), 0,1,0, -sin(r),sin(r),-cos(r)]);
-}
+})();
 
 /**
  * Creates a rotation matrix around absolute X axis of angle r.
@@ -395,9 +416,46 @@ create.rotateY = function(r) {
  * @param {radian} r angle as a radian
  * @return {matrix} 3x3 matrix
  */
-create.rotateX = function(r) {
-	return this(3, 3, [cos(r),-sin(r),0, sin(r),cos(r),0, 0,0,1]);
-}
+create.rotateX = (function() {
+	let cosr = 0.0, sinr = 0.0, scratch = Float32Array.from([
+		1.0,0.0,0.0,
+		0.0,1.0,0.0,
+		0.0,0.0,1.0
+	]);
+	return function rotateX(r, buffer = undefined, offset = 0) {
+		cosr = cos(r);
+		sinr = sin(r);
+		scratch[4] = cosr;
+		scratch[5] = -sinr;
+		scratch[7] = sinr;
+		scratch[8] = cosr;
+		return create(3, 3, scratch, buffer, offset);
+	}
+})();
+
+/**
+ * Creates a rotation matrix around absolute Y axis of angle r.
+ * @example
+ * matrices.create.rotateY(1.5708); // 90 degree rotation around Y axis
+ * @param {radian} r angle as a radian
+ * @return {matrix} 3x3 matrix
+ */
+create.rotateY = (function() {
+	let cosr = 0.0, sinr = 0.0, scratch = Float32Array.from([
+		1.0,0.0,0.0,
+		0.0,1.0,0.0,
+		0.0,0.0,1.0
+	]);
+	return function rotateY(r, buffer = undefined, offset = 0) {
+		cosr = cos(r);
+		sinr = sin(r);
+		scratch[0] = cosr;
+		scratch[2] = sinr;
+		scratch[6] = -sinr;
+		scratch[8] = cosr;
+		return create(3, 3, scratch, buffer, offset);
+	}
+})();
 
 /**
  * Creates a rotation matrix around absolute Z axis of angle r.
@@ -406,6 +464,19 @@ create.rotateX = function(r) {
  * @param {radian} r angle as a radian
  * @return {matrix} 3x3 matrix
  */
-create.rotateZ = function(r) {
-	return this(3, 3, [1,0,0, 0,cos(r),-sin(r), 0,sin(r),cos(r)]);
-}
+create.rotateZ = (function() {
+	let cosr = 0.0, sinr = 0.0, scratch = Float32Array.from([
+		1.0,0.0,0.0,
+		0.0,1.0,0.0,
+		0.0,0.0,1.0
+	]);
+	return function rotateZ(r, buffer = undefined, offset = 0) {
+		cosr = cos(r);
+		sinr = sin(r);
+		scratch[0] = cosr;
+		scratch[1] = -sinr;
+		scratch[3] = sinr;
+		scratch[4] = cosr;
+		return create(3, 3, scratch, buffer, offset);
+	}
+})();
