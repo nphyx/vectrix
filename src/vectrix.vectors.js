@@ -532,11 +532,11 @@ export const magnitude = (() => {
  * Get a string representation of a vector.
  * @example
  * vectors.create.vec2([23,1]).toString(); // vec2(23.00, 1.00)
- * vecToString(vectors.create.vec2([23,1])); // vec2(23.00, 1.00)
+ * vectors.toString(vectors.create.vec2([23,1])); // vec2(23.00, 1.00)
  * @param {vector} a input vector
  * @return {string}
  */
-export function vecToString(a) {
+export function toString(a) {
 	let strings = a.toArray().map((cur) => cur.toFixed(2));
 	return "vec"+a.length+"("+strings.join(", ")+")";
 }
@@ -595,7 +595,7 @@ export function create() {
 	vec.cubic = asMethod(cubic, vec);
 	vec.angle = asMethod(angle, vec);
 	vec.distance = asMethod(distance, vec);
-	vec.toString = asMethod(vecToString, vec);
+	vec.toString = asMethod(toString, vec);
 	return vec;
 }
 
