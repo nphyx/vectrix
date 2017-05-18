@@ -279,9 +279,30 @@ describe("rotation matrices", function() {
 	let rx = create.rotateX(r90); // do a 90 degree rotation
 	let ry = create.rotateY(r90); // do a 90 degree rotation
 	let rz = create.rotateZ(r90); // do a 90 degree rotation
+	console.log(rx.toString());
 	let x = create(3,1,Float32Array.of(1,0,0));
 	let y = create(3,1,Float32Array.of(0,1,0));
 	let z = create(3,1,Float32Array.of(0,0,1));
+	it("should create appropriate matrices for rotation", function() {
+		rx.toArray().should.be.nearly([1,0,0,0,0,-1,0,1,0], 1.0e-16);
+		ry.toArray().should.be.nearly([0,0,1,0,1,0,-1,0,0], 1.0e-16);
+		rz.toArray().should.be.nearly([0,-1,0,1,0,0,0,0,1], 1.0e-16);
+		// with pre-supplied buffer
+		let buffer = new ArrayBuffer(3*3*4+4);
+		create.rotateX(r90,buffer).buffer.should.equal(buffer);
+		create.rotateX(r90,buffer).toArray().should.be.nearly([1,0,0,0,0,-1,0,1,0], 1.0e-16);
+		create.rotateY(r90,buffer).buffer.should.equal(buffer);
+		create.rotateY(r90,buffer).toArray().should.be.nearly([0,0,1,0,1,0,-1,0,0], 1.0e-16);
+		create.rotateZ(r90,buffer).buffer.should.equal(buffer);
+		create.rotateZ(r90,buffer).toArray().should.be.nearly([0,-1,0,1,0,0,0,0,1], 1.0e-16);
+		// with buffer + offset
+		create.rotateX(r90,buffer,4).buffer.should.equal(buffer);
+		create.rotateX(r90,buffer,4).toArray().should.be.nearly([1,0,0,0,0,-1,0,1,0], 1.0e-16);
+		create.rotateY(r90,buffer,4).buffer.should.equal(buffer);
+		create.rotateY(r90,buffer,4).toArray().should.be.nearly([0,0,1,0,1,0,-1,0,0], 1.0e-16);
+		create.rotateZ(r90,buffer,4).buffer.should.equal(buffer);
+		create.rotateZ(r90,buffer,4).toArray().should.be.nearly([0,-1,0,1,0,0,0,0,1], 1.0e-16);
+	});
 	it("should produce a rx matrix that rotates 3d vectors around the x axis", function() {
 		dot(rx,x).toArray().should.be.nearly([1,0,0], 1.0e-16);
 		dot(rx,y).toArray().should.be.nearly([0,0,1], 1.0e-16);
