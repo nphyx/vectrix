@@ -308,17 +308,25 @@ export const mut_copy = (() => {
 
 
 /**
- * Homogenous coordinates for a vector. Note this does not return
- * a vector because it's not really useful to do so.
+ * Homogenous coordinates for a vector. 
  *
  * @function homogenous
  * @param {vector} a input vector
+ * @param {vector} out (optional) out parameter of one higher demnsion than a
  * @return {matrix}
  */
-export function homogenous(a) {
-	return Float32Array.from(Array.prototype.concat.call(Array.prototype.slice.call(a), [1]));
-	//return matrices.create(a.length+1,1,a.toArray().concat(1));
-}
+export const homogenous = (function() {
+	let i = 0|0, len = 0|0;
+	return function homogenous(a, out = undefined) {
+		len = a.length;
+		out = out||create(a.length+1);
+		for(i = 0|0; i < len; ++i) {
+			out[i] = a[i];
+		}
+		out[i] = 1.0;
+		return out;
+	}
+})();
 
 /**
  * Normalize a vector.

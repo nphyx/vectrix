@@ -41,9 +41,13 @@ describe("vector functions", function() {
 		let vec2 = Float32Array.of(7,4);
 		let vec3 = Float32Array.of(7,4,5);
 		let vec4 = Float32Array.of(7,4,5,-2);
-		homogenous(vec2).should.eql(Float32Array.of(7,4,1));
-		homogenous(vec3).should.eql(Float32Array.of(7,4,5,1));
-		homogenous(vec4).should.eql(Float32Array.of(7,4,5,-2,1));
+		let out = Array(5);
+		homogenous(vec2).toArray().should.eql([7,4,1]);
+		homogenous(vec3).toArray().should.eql([7,4,5,1]);
+		homogenous(vec4).toArray().should.eql([7,4,5,-2,1]);
+		// with out parameter
+		homogenous(vec4, out).should.eql([7,4,5,-2,1]);
+		homogenous(vec4, out).should.equal(out);
 	});
 	it("should produce correct products for scalars, arrays, and vectors", function() {
 		let times = vectors.times;
