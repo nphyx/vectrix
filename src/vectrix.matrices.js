@@ -291,7 +291,7 @@ export const toString = (function() {
 		return ((" ").repeat(l)+s).slice(-l);
 	}
 	function makeStrings(a) {
-		return a.toArray().map((cur) => cur.toFixed(2));
+		return toArray(a).map((cur) => cur.toFixed(2));
 	}
 	return function toString(a) {
 		c = a.cols|0;
@@ -341,15 +341,23 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
 	matrix.cols = cols;
 	if(vals.length) matrix.set(vals);
 	else matrix.fill(0.0); // just in case it was a previously used buffer
+	return matrix;
+}
+
+/**
+ * Wraps an matrix (created by [create](#create)) with matrix methods.
+ * @param {array-like} matrix a matrix, Array, or Float32Array to wrap as a matrix
+ * @param {int} rows (required for non-matrices) number of rows the matrix should have
+ * @param {int} cols (required for non-matrices) number of columns the matrix should have
+ * @return {matrix} a wrapped matrix
+ */
+export function wrap(matrix, rows, cols) {
+	matrix.rows = rows||matrix.rows;
+	matrix.cols = cols||matrix.cols;
 	matrix.toArray = toArray.bind(null, matrix);
 	matrix.toString = toString.bind(null, matrix);
 	matrix.col = col.bind(null, matrix);
 	matrix.row = row.bind(null, matrix);
-	matrix.wrap = wrap.bind(null, matrix);
-	return matrix;
-}
-
-export function wrap(matrix) {
 	matrix.plus = plus.bind(null, matrix);
 	matrix.minus = minus.bind(null, matrix);
 	matrix.dot = dot.bind(null, matrix);
