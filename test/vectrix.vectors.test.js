@@ -49,6 +49,12 @@ describe("vector functions", function() {
 		homogenous(vec4, out).should.eql([7,4,5,-2,1]);
 		homogenous(vec4, out).should.equal(out);
 	});
+	it("should not mutate a vector when producing a homogenous version", function() {
+		let homogenous = vectors.homogenous;
+		let vec4 = Float32Array.of(7,4,5,-2);
+		homogenous(vec4).toArray().should.eql([7,4,5,-2,1]);
+		vec4.should.eql(Float32Array.of(7,4,5,-2));
+	});
 	it("should produce correct products for scalars, arrays, and vectors", function() {
 		let times = vectors.times;
 		let vec = Float32Array.of(1,1,1);
@@ -75,7 +81,7 @@ describe("vector functions", function() {
 		a.should.eql(Float32Array.of(2,1,1,1));
 		b.should.eql(Float32Array.of(3,4,5,6));
 	});
-	it("should mutate the first operand only when mutably multiplying an array by a scalar", function() {
+	it("should mutate only the first operand when mutably multiplying an array by a scalar", function() {
 		let mut_times = vectors.mut_times, toArray = matrices.toArray;
 		let a = Float32Array.of(2,1,1,1);
 		let b = Float32Array.of(3,4,5,6);
@@ -100,14 +106,27 @@ describe("vector functions", function() {
 		normalize(vec4, out).should.be.nearly(Float32Array.of(0.134984, 0.776157, 0.615864, 0.00843649), 1.0e-6);
 		normalize(vec4, out).should.equal(out);
 	});
+	it("should not mutate its operand when normalizing a vector", function() {
+		let normalize = vectors.normalize;
+		let vec4 = Float32Array.of(16, 92, 73, 1);
+		normalize(vec4);
+		vec4.should.eql(Float32Array.of(16, 92, 73, 1));
+	});
+	it("should mutate its operand during a mutating normalize operation", function() {
+		let mut_normalize = vectors.mut_normalize;
+		let vec4 = Float32Array.of(16, 92, 73, 1);
+		mut_normalize(vec4);
+		vec4.should.be.nearly(Float32Array.of(0.134984, 0.776157, 0.615864, 0.00843649), 1.0e-6);
+	});
 	it("should perform linear interpolations correctly on like vectors", function() {
 		let lerp = vectors.lerp;
 		let vec2 = Float32Array.of(2,3);
 		let vec3 = Float32Array.of(4,8,16);
 		let vec4 = Float32Array.of(9,18,27,1);
+		let t = 0.5;
 		let out = new Array(4);
-		lerp(vec2, Float32Array.of(4,6), 0.5).toArray().should.eql([3,4.5]);
-		lerp(vec3, Float32Array.of(2,4,8), 0.5).toArray().should.eql([3,6,12]);
+		lerp(vec2, Float32Array.of(4,6), t).toArray().should.eql([3,4.5]);
+		lerp(vec3, Float32Array.of(2,4,8), t).toArray().should.eql([3,6,12]);
 		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666).toArray().should
 			.be.nearly([3,6,9,0.3333], 1.0e-3);
 		// extrapolation should work too
@@ -118,6 +137,24 @@ describe("vector functions", function() {
 		// support for out parameter
 		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.be.nearly([3,6,9,0.3333], 1.0e-3);
 		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.equal(out);
+	});
+	it("should not mutate operands during lerp", function() {
+		let lerp = vectors.lerp;
+		let a = Float32Array.of(2,3);
+		let b = Float32Array.of(4,6);
+		let t = 0.5;
+		lerp(a, b, t).toArray().should.eql([3,4.5]);
+		a.should.eql(Float32Array.of(2,3));
+		b.should.eql(Float32Array.of(4,6));
+		t.should.eql(0.5);
+	});
+	it("should mutate only the first operand during a mutating linear interpolation", function() {
+		let a = Float32Array.of(2,3);
+		let b = Float32Array.of(4,6);
+		let t = 0.5;
+		vectors.mut_lerp(a, b, t).should.eql(a);
+		b.should.eql(Float32Array.of(4,6));
+		t.should.eql(0.5);
 	});
 	it("should perform cubic interpolations correctly on like vectors", function() {
 		// can only verify 2d with precalculated values for lack of good source for 3d or 
@@ -133,6 +170,32 @@ describe("vector functions", function() {
 		// with out param
 		cubic(a, b, c, d, t, out).toArray().should.eql([6.75,5.875]);
 		cubic(a, b, c, d, t, out).should.eql(out);
+	});
+	it("should not mutate operands during cubic interpolation", function() {
+		let cubic = vectors.cubic;
+		let a = Float32Array.of(5,6);
+		let b = Float32Array.of(9,7);
+		let c = Float32Array.of(4,4);
+		let d = Float32Array.of(10,8);
+		let t = 0.5;
+		cubic(a, b, c, d, t).toArray().should.eql([6.75,5.875]);
+		a.should.eql(Float32Array.of(5,6));
+		b.should.eql(Float32Array.of(9,7));
+		c.should.eql(Float32Array.of(4,4));
+		d.should.eql(Float32Array.of(10,8));
+		t.should.eql(0.5);
+	});
+	it("should mutate only the first operand during a mutating cubic interpolation", function() {
+		let a = Float32Array.of(5,6);
+		let b = Float32Array.of(9,7);
+		let c = Float32Array.of(4,4);
+		let d = Float32Array.of(10,8);
+		let t = 0.5;
+		vectors.mut_cubic(a, b, c, d, t).should.eql(a);
+		b.should.eql(Float32Array.of(9,7));
+		c.should.eql(Float32Array.of(4,4));
+		d.should.eql(Float32Array.of(10,8));
+		t.should.eql(0.5);
 	});
 	it("should find the angle between any two like vectors", function() {
 		let angle = vectors.angle;

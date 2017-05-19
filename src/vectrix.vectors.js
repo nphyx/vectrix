@@ -282,6 +282,23 @@ function asMethod(method, vector) {
  * End ugly code for generating aliases.
  */
 
+
+/**
+ * @private
+ * used in [lerp](#lerp)
+ */
+function lerp_element(a, b, t) {
+	return a+t*(b-a);
+}
+
+/**
+ * @private
+ * used in [cubic](#cubic)
+ */
+function cubic_step(a, b, c, d, f0, f1, f2, f3) {
+	return a*f0 + b*f1 + c*f2 + d*f3;
+}
+
 /**
  * Copies values from second operand into first.
  * @example
@@ -312,7 +329,7 @@ export const mut_copy = (() => {
  *
  * @function homogenous
  * @param {vector} a input vector
- * @param {vector} out (optional) out parameter of one higher demnsion than a
+ * @param {vector} out (optional) out parameter of one higher dimension than a
  * @return {matrix}
  */
 export const homogenous = (function() {
@@ -357,8 +374,14 @@ export const normalize = (function() {
 	}
 })();
 
-function lerp_element(a, b, t) {
-	return a+t*(b-a);
+/**
+ * Mutating version of [normalize](#normalize).
+ * @function mut_normalize
+ * @param {vector} a input vector
+ * @return {matrix}
+ */
+export function mut_normalize(a) {
+	return normalize(a, a);
 }
 
 /**
@@ -383,14 +406,20 @@ export const lerp = (function() {
 })();
 
 /**
- * used in [cubic](#cubic)
+ * Mutating version of [lerp](#lerp).
+ * @function lerp
+ * @param {vector} a first operand
+ * @param {vector} b second operand
+ * @param {float} t interval
+ * @param {vector} out (optional) vector of same dimensions as a & b
+ * @return {vector}
  */
-function cubic_step(a, b, c, d, f0, f1, f2, f3) {
-	return a*f0 + b*f1 + c*f2 + d*f3;
+export function mut_lerp(a, b, t) {
+	return lerp(a, b, t, a);
 }
 
 /**
- * Perform a cubic bezier interpolation
+ * Perform a cubic bezier interpolation.
  * @function cubic
  * @param {vector} a start point
  * @param {vector} b first control point
@@ -420,6 +449,20 @@ export const cubic = (function() {
 		return out;
 	}
 })();
+
+/**
+ * Mutating version of [cubic](#cubic).
+ * @function mut_cubic
+ * @param {vector} a start point
+ * @param {vector} b first control point
+ * @param {vector} c second control point
+ * @param {vector} d end point
+ * @param {float} t interval
+ * @return {vector} interpolated a
+ */
+export function mut_cubic(a, b, c, d, t) {
+	return cubic(a, b, c, d, t, a);
+}
 
 /**
  * Vector product for matching vector types. Accepts vectors or generic arrays, 
