@@ -357,17 +357,30 @@ export const normalize = (function() {
 	}
 })();
 
+function lerp_element(a, b, t) {
+	return a+t*(b-a);
+}
+
 /**
  * Perform a linear interpolation between two vectors.
  * @function lerp
  * @param {vector} a first operand
  * @param {vector} b second operand
  * @param {float} t interval
+ * @param {vector} out (optional) vector of same dimensions as a & b
  * @return {vector}
  */
-export function lerp(a, b, t) {
-	return a.map((cur, i) => a[i]+t*(b[i]-a[i]));
-}
+export const lerp = (function() {
+	let i = 0|0, len = 0|0;
+	return function lerp(a, b, t, out) {
+		len = a.length;
+		out = out||create(len);
+		for(i = 0|0; i < len; ++i) {
+			out[i] = lerp_element(a[i], b[i], t);
+		}
+		return out;
+	}
+})();
 
 /**
  * Perform a cubic bezier interpolation

@@ -105,16 +105,19 @@ describe("vector functions", function() {
 		let vec2 = Float32Array.of(2,3);
 		let vec3 = Float32Array.of(4,8,16);
 		let vec4 = Float32Array.of(9,18,27,1);
-		lerp(vec2, Float32Array.of(4,6), 0.5).should.eql(Float32Array.of(3,4.5));
-		lerp(vec3, Float32Array.of(2,4,8), 0.5).should.eql(Float32Array.of(3,6,12));
-		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666).should.be.nearly(
-			Float32Array.of(3,6,9,0.3333), 1.0e-3
-		);
+		let out = new Array(4);
+		lerp(vec2, Float32Array.of(4,6), 0.5).toArray().should.eql([3,4.5]);
+		lerp(vec3, Float32Array.of(2,4,8), 0.5).toArray().should.eql([3,6,12]);
+		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666).toArray().should
+			.be.nearly([3,6,9,0.3333], 1.0e-3);
 		// extrapolation should work too
-		lerp(vec2, Float32Array.of(4,6), 0).should.eql(Float32Array.of(2,3));
-		lerp(vec2, Float32Array.of(4,6), -1).should.eql(Float32Array.of(0,0));
-		lerp(vec2, Float32Array.of(4,6), 1).should.eql(Float32Array.of(4,6));
-		lerp(vec2, Float32Array.of(4,6), 2).should.eql(Float32Array.of(6,9));
+		lerp(vec2, Float32Array.of(4,6),  0).toArray().should.eql([2,3]);
+		lerp(vec2, Float32Array.of(4,6), -1).toArray().should.eql([0,0]);
+		lerp(vec2, Float32Array.of(4,6),  1).toArray().should.eql([4,6]);
+		lerp(vec2, Float32Array.of(4,6),  2).toArray().should.eql([6,9]);
+		// support for out parameter
+		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.be.nearly([3,6,9,0.3333], 1.0e-3);
+		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.equal(out);
 	});
 	it("should perform cubic interpolations correctly on like vectors", function() {
 		// can only verify 2d with precalculated values for lack of good source for 3d or 
