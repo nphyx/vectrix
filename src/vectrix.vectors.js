@@ -383,6 +383,13 @@ export const lerp = (function() {
 })();
 
 /**
+ * used in [cubic](#cubic)
+ */
+function cubic_step(a, b, c, d, f0, f1, f2, f3) {
+	return a*f0 + b*f1 + c*f2 + d*f3;
+}
+
+/**
  * Perform a cubic bezier interpolation
  * @function cubic
  * @param {vector} a start point
@@ -390,19 +397,29 @@ export const lerp = (function() {
  * @param {vector} c second control point
  * @param {vector} d end point
  * @param {float} t interval
+ * @param {vector} out (optional) vector of same dimensions as start point 
  * @return {vector}
  */
-export function cubic(a, b, c, d, t) {
-	/* parametric cubic bezier, faster than dec */
-	let inv = 1-t,
-			inv2 = inv*inv,
-			fs = t*t,
-			f0 = inv2 * inv,
-			f1 = 3 * t * inv2,
-			f2 = 3 * fs * inv,
-			f3 = fs * t;
-	return a.map((cur, i) => a[i]*f0 + b[i]*f1 + c[i]*f2 + d[i]*f3);	
-}
+export const cubic = (function() {
+	let i = 0|0, len = 0|0, inv = 0.0, inv2 = 0.0, 
+			fs = 0.0, f0 = 0.0, f1 = 0.0, f2 = 0.0, f3 = 0.0;
+	return function cubic(a, b, c, d, t, out = undefined) {
+		len = a.length;
+		out = out||create(len);
+		/* parametric cubic bezier, faster than dec */
+		inv = 1-t;
+		inv2 = inv*inv;
+		fs = t*t;
+		f0 = inv2 * inv;
+		f1 = 3 * t * inv2;
+		f2 = 3 * fs * inv;
+		f3 = fs * t;
+		for(i = 0|0; i < len; ++i) {
+			out[i] = cubic_step(a[i], b[i], c[i], d[i], f0, f1, f2, f3);
+		}
+		return out;
+	}
+})();
 
 /**
  * Vector product for matching vector types. Accepts vectors or generic arrays, 

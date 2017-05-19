@@ -123,8 +123,16 @@ describe("vector functions", function() {
 		// can only verify 2d with precalculated values for lack of good source for 3d or 
 		// 4d, but "should" work for 3d and 4d vectors too :/
 		let cubic = vectors.cubic;
-		let vec2 = Float32Array.of(5,6);
-		cubic(vec2, Float32Array.of(9,7),Float32Array.of(4,4),Float32Array.of(10,8),0.5).should.eql(Float32Array.of(6.75,5.875));
+		let a = Float32Array.of(5,6);
+		let b = Float32Array.of(9,7);
+		let c = Float32Array.of(4,4);
+		let d = Float32Array.of(10,8);
+		let t = 0.5;
+		let out = cubic(a, b, c, d, t);
+		out.toArray().should.eql([6.75,5.875]);
+		// with out param
+		cubic(a, b, c, d, t, out).toArray().should.eql([6.75,5.875]);
+		cubic(a, b, c, d, t, out).should.eql(out);
 	});
 	it("should find the angle between any two like vectors", function() {
 		let angle = vectors.angle;
