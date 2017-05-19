@@ -519,12 +519,14 @@ export function mut_times(a, b) {
  * @param {vector} b second operand
  * @return {vector}
  */
-export function angle(a, b) {
-	let anorm = normalize(a);
-	let bnorm = normalize(b);
-	var cos = times(anorm, bnorm);
-	return acos(cos);
-}
+export const angle = (function() {
+	let anorm, bnorm;
+	return function angle(a, b) {
+		anorm = normalize(a);
+		bnorm = normalize(b);
+		return acos(times(anorm, bnorm));
+	}
+})();
 
 
 /**
@@ -534,10 +536,18 @@ export function angle(a, b) {
  * @param {vector} b second operand
  * @return {float} distance
  */
-export function distance(a, b) {
-	let dist = a.map((cur, i) => b[i] - a[i]);
-	return sqrt(dist.map((cur) => cur*cur).reduce((p, c) => p + c), 0);
-}
+export const distance = (function() {
+	let i = 0|0, len = 0|0, sum = 0.0, tmp = 0.0;
+	return function distance(a, b) {
+		sum = 0.0;
+		len = a.length;
+		for(i = 0|0; i < len; ++i) {
+			tmp = b[i] - a[i];
+			sum = sum + tmp*tmp;
+		}
+		return sqrt(sum);
+	}
+})();
 
 
 /**
