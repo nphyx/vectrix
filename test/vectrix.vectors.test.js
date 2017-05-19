@@ -3,6 +3,7 @@ require("should");
 require("./helpers/should.nearly.js");
 import * as vectors from "../src/vectrix.vectors";
 import * as matrices from "../src/vectrix.matrices";
+const toArray = matrices.toArray;
 
 describe("vector functions", function() {
 	it("should all exist", function() {
@@ -15,12 +16,15 @@ describe("vector functions", function() {
 		vectors.times.should.be.a.Function();
 		vectors.mut_times.should.be.a.Function();
 		vectors.normalize.should.be.a.Function();
+		vectors.mut_normalize.should.be.a.Function();
 		vectors.lerp.should.be.a.Function();
+		vectors.mut_lerp.should.be.a.Function();
 		vectors.clamp.should.be.a.Function();
 		vectors.mut_clamp.should.be.a.Function();
 		vectors.magnitude.should.be.a.Function();
 		vectors.mut_copy.should.be.a.Function();
 		vectors.cubic.should.be.a.Function();
+		vectors.mut_cubic.should.be.a.Function();
 		vectors.angle.should.be.a.Function();
 		vectors.distance.should.be.a.Function();
 		vectors.toString.should.be.a.Function();
@@ -30,9 +34,9 @@ describe("vector functions", function() {
 		let a = Float32Array.of(1,2);
 		let b = Float32Array.of(2,1);
 		let c = Float32Array.of(2,-2,2);
-		cross(a, b).should.eql(Float32Array.of(0,0,-3));
-		cross(a, c).should.eql(Float32Array.of(4,-2,-6));
-		cross(c, a).should.eql(Float32Array.of(-4,2,6));
+		toArray(cross(a, b)).should.eql([0,0,-3]);
+		toArray(cross(a, c)).should.eql([4,-2,-6]);
+		toArray(cross(c, a)).should.eql([-4,2,6]);
 		(typeof(cross(a, Float32Array.of(0))) === "undefined").should.be.true();
 		(typeof(cross(a, Float32Array.of(1,2,3,4))) === "undefined").should.be.true();
 	});
@@ -42,9 +46,9 @@ describe("vector functions", function() {
 		let vec3 = Float32Array.of(7,4,5);
 		let vec4 = Float32Array.of(7,4,5,-2);
 		let out = Array(5);
-		homogenous(vec2).toArray().should.eql([7,4,1]);
-		homogenous(vec3).toArray().should.eql([7,4,5,1]);
-		homogenous(vec4).toArray().should.eql([7,4,5,-2,1]);
+		toArray(homogenous(vec2)).should.eql([7,4,1]);
+		toArray(homogenous(vec3)).should.eql([7,4,5,1]);
+		toArray(homogenous(vec4)).should.eql([7,4,5,-2,1]);
 		// with out parameter
 		homogenous(vec4, out).should.eql([7,4,5,-2,1]);
 		homogenous(vec4, out).should.equal(out);
@@ -52,7 +56,7 @@ describe("vector functions", function() {
 	it("should not mutate a vector when producing a homogenous version", function() {
 		let homogenous = vectors.homogenous;
 		let vec4 = Float32Array.of(7,4,5,-2);
-		homogenous(vec4).toArray().should.eql([7,4,5,-2,1]);
+		toArray(homogenous(vec4)).should.eql([7,4,5,-2,1]);
 		vec4.should.eql(Float32Array.of(7,4,5,-2));
 	});
 	it("should produce correct products for scalars, arrays, and vectors", function() {
@@ -125,15 +129,15 @@ describe("vector functions", function() {
 		let vec4 = Float32Array.of(9,18,27,1);
 		let t = 0.5;
 		let out = new Array(4);
-		lerp(vec2, Float32Array.of(4,6), t).toArray().should.eql([3,4.5]);
-		lerp(vec3, Float32Array.of(2,4,8), t).toArray().should.eql([3,6,12]);
-		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666).toArray().should
+		toArray(lerp(vec2, Float32Array.of(4,6), t)).should.eql([3,4.5]);
+		toArray(lerp(vec3, Float32Array.of(2,4,8), t)).should.eql([3,6,12]);
+		toArray(lerp(vec4, Float32Array.of(0,0,0,0), 0.666666)).should
 			.be.nearly([3,6,9,0.3333], 1.0e-3);
 		// extrapolation should work too
-		lerp(vec2, Float32Array.of(4,6),  0).toArray().should.eql([2,3]);
-		lerp(vec2, Float32Array.of(4,6), -1).toArray().should.eql([0,0]);
-		lerp(vec2, Float32Array.of(4,6),  1).toArray().should.eql([4,6]);
-		lerp(vec2, Float32Array.of(4,6),  2).toArray().should.eql([6,9]);
+		toArray(lerp(vec2, Float32Array.of(4,6),  0)).should.eql([2,3]);
+		toArray(lerp(vec2, Float32Array.of(4,6), -1)).should.eql([0,0]);
+		toArray(lerp(vec2, Float32Array.of(4,6),  1)).should.eql([4,6]);
+		toArray(lerp(vec2, Float32Array.of(4,6),  2)).should.eql([6,9]);
 		// support for out parameter
 		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.be.nearly([3,6,9,0.3333], 1.0e-3);
 		lerp(vec4, Float32Array.of(0,0,0,0), 0.666666, out).should.equal(out);
@@ -143,7 +147,7 @@ describe("vector functions", function() {
 		let a = Float32Array.of(2,3);
 		let b = Float32Array.of(4,6);
 		let t = 0.5;
-		lerp(a, b, t).toArray().should.eql([3,4.5]);
+		toArray(lerp(a, b, t)).should.eql([3,4.5]);
 		a.should.eql(Float32Array.of(2,3));
 		b.should.eql(Float32Array.of(4,6));
 		t.should.eql(0.5);
@@ -166,9 +170,9 @@ describe("vector functions", function() {
 		let d = Float32Array.of(10,8);
 		let t = 0.5;
 		let out = cubic(a, b, c, d, t);
-		out.toArray().should.eql([6.75,5.875]);
+		toArray(out).should.eql([6.75,5.875]);
 		// with out param
-		cubic(a, b, c, d, t, out).toArray().should.eql([6.75,5.875]);
+		toArray(cubic(a, b, c, d, t, out)).should.eql([6.75,5.875]);
 		cubic(a, b, c, d, t, out).should.eql(out);
 	});
 	it("should not mutate operands during cubic interpolation", function() {
@@ -178,7 +182,7 @@ describe("vector functions", function() {
 		let c = Float32Array.of(4,4);
 		let d = Float32Array.of(10,8);
 		let t = 0.5;
-		cubic(a, b, c, d, t).toArray().should.eql([6.75,5.875]);
+		toArray(cubic(a, b, c, d, t)).should.eql([6.75,5.875]);
 		a.should.eql(Float32Array.of(5,6));
 		b.should.eql(Float32Array.of(9,7));
 		c.should.eql(Float32Array.of(4,4));
@@ -246,276 +250,218 @@ describe("vector functions", function() {
 describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
 		let vec = vectors.vec2();
-		vec.toArray().should.eql([0,0]);
+		toArray(vec).should.eql([0,0]);
 		vec.rows.should.eql(2);
 		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 2", function() {
 		let initial = [1,2];
 		let vec = vectors.vec2(initial);
-		vec.toArray().should.eql(initial);
+		toArray(vec).should.eql(initial);
 	});
 	it("should create a populated vector when given two arguments", function() {
 		let vec = vectors.vec2(3,4);
-		vec.toArray().should.eql([3,4]);
+		toArray(vec).should.eql([3,4]);
 	});
 	it("should create vectors with pre-supplied buffers", function() {
 		let buffer, vec;
 		// 2d vectors
 		buffer = new ArrayBuffer(2*4+4);
 		vec = vectors.vec2(buffer); // with only buffer 
-		vec.toArray().should.eql([0,0]);
+		toArray(vec).should.eql([0,0]);
 		vec.buffer.should.eql(buffer);
 		vec = vectors.vec2(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(2*4+4);
 		vec.byteLength.should.eql(2*4);
-		vec.toArray().should.eql([0,0]);
+		toArray(vec).should.eql([0,0]);
 		vec = vectors.vec2([2.3, 0.1], buffer, 4); // with values, buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(2*4+4);
 		vec.byteLength.should.eql(2*4);
-		vec.toArray().should.be.nearly([2.3,0.1], 1e-6);
+		toArray(vec).should.be.nearly([2.3,0.1], 1e-6);
 		// 3d vectors
 		buffer = new ArrayBuffer(3*4+4);
 		vec = vectors.vec3(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(3*4+4);
 		vec.byteLength.should.eql(3*4);
-		vec.toArray().should.eql([0,0,0]);
+		toArray(vec).should.eql([0,0,0]);
 		vec = vectors.vec3([2.3, 0.1, 1.2], buffer, 4); // with values, buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(3*4+4);
 		vec.byteLength.should.eql(3*4);
-		vec.toArray().should.be.nearly([2.3, 0.1, 1.2], 1e-6);
+		toArray(vec).should.be.nearly([2.3, 0.1, 1.2], 1e-6);
 		// 4d vectors
 		buffer = new ArrayBuffer(4*4+4);
 		vec = vectors.vec4(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(4*4+4);
 		vec.byteLength.should.eql(4*4);
-		vec.toArray().should.eql([0,0,0,0]);
+		toArray(vec).should.eql([0,0,0,0]);
 		vec = vectors.vec4([2.4, 0.1, 1.2, 6.3], buffer, 4); // with values, buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(4*4+4);
 		vec.byteLength.should.eql(4*4);
-		vec.toArray().should.be.nearly([2.4, 0.1, 1.2, 6.3], 1e-6);
+		toArray(vec).should.be.nearly([2.4, 0.1, 1.2, 6.3], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3)}).should.throwError();
 	});
-	it("should have all the 2d vector aliases", function() {
-		let vec = vectors.vec2([1,2]);
-		vec.x.should.equal(1);
-		vec.y.should.equal(2);
-		vectors.aliases2d.forEach((aliases) => {
-			aliases.names.forEach((name) => {
-				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
-			});
-		});
-		vectors.aliasCombos2d.forEach((combo) => {
-			let name = combo.join("");
-			vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
-		});
-	});
 	it("should produce a copy of itself when multiplied by an identity matrix", function() {
 		let vec = vectors.vec2(7,4);
 		let matrix = matrices.create(2,2,[1,0, 0,1]);
-		matrix.dot(vec).toArray().should.eql([7,4]);
+		toArray(matrices.dot(matrix, vec)).should.eql([7,4]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec2(7,4);
 		let matrix = matrices.create(2,2,[2,0, 0,2]);
-		matrix.dot(vec).toArray().should.eql([14,8]);
+		toArray(matrices.dot(matrix, vec)).should.eql([14,8]);
 	});
 	it("should be translated by a translation matrix", function() {
 		let vec = vectors.vec2(7,4);
 		let matrix = matrices.create(3,3,[1,0,-9, 0,1,4, 0,0,1]);
-		matrix.dot(vec.homogenous()).toArray().should.eql([-2,8,1]);
+		toArray(matrices.dot(matrix, vectors.homogenous(vec))).should.eql([-2,8,1]);
 	});
 });
 describe("a 3d vector", function() {
 	it("should create a vector [0,0,0] when given no arguments", function() {
 		let vec = vectors.vec3();
-		vec.toArray().should.eql([0,0,0]);
+		toArray(vec).should.eql([0,0,0]);
 		vec.rows.should.eql(3);
 		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 3", function() {
 		let initial = [1,2,3];
 		let vec = vectors.vec3(initial);
-		vec.toArray().should.eql(initial);
+		toArray(vec).should.eql(initial);
 	});
 	it("should create a populated vector when given three arguments", function() {
 		let vec = vectors.vec3(4,5,6);
-		vec.toArray().should.eql([4,5,6]);
+		toArray(vec).should.eql([4,5,6]);
 	});
 	it("should create a 3d vector given a 2d vector-like object and a z value", function() {
 		let vec = vectors.vec3([0,1], 1);
-		vec.toArray().should.eql([0,1,1]);
+		toArray(vec).should.eql([0,1,1]);
 		vec = vectors.vec3(vectors.vec2(4,3), 6);
-		vec.toArray().should.eql([4,3,6]);
+		toArray(vec).should.eql([4,3,6]);
 		vec = vectors.vec3(matrices.create(1,2, [0,5]), 3);
-		vec.toArray().should.eql([0,5,3]);
+		toArray(vec).should.eql([0,5,3]);
 	});
 	it("should create vectors with pre-supplied buffers", function() {
 		let buffer, vec;
 		buffer = new ArrayBuffer(3*4);
 		vec = vectors.vec3(buffer); // with only buffer 
-		vec.toArray().should.eql([0,0,0]);
+		toArray(vec).should.eql([0,0,0]);
 		vec.buffer.should.eql(buffer);
 		buffer = new ArrayBuffer(3*4+4);
 		vec = vectors.vec3(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(3*4+4);
 		vec.byteLength.should.eql(3*4);
-		vec.toArray().should.eql([0,0,0]);
+		toArray(vec).should.eql([0,0,0]);
 		vec = vectors.vec3([3.3, 0.1, 2.2], buffer, 4); // with values, buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(3*4+4);
 		vec.byteLength.should.eql(3*4);
-		vec.toArray().should.be.nearly([3.3,0.1,2.2], 1e-6);
+		toArray(vec).should.be.nearly([3.3,0.1,2.2], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4)}).should.throwError();
 	});
-	it("should have all the 3d vector aliases", function() {
-		let vec = vectors.vec3([1,2,3]);
-		// test a few of them just to make sure the mapping is good
-		vec.x.should.equal(1);
-		vec.y.should.equal(2);
-		vec.z.should.equal(3);
-		vec.yz.toArray().should.eql([2,3]);
-		vec.xyz.toArray().should.eql([1,2,3]);
-		vec.zyx.toArray().should.eql([3,2,1]);
-		vec.rgb.toArray().should.eql([1,2,3]);
-		vec.rbg.toArray().should.eql([1,3,2]);
-		vec.bgr.toArray().should.eql([3,2,1]);
-		// skim the rest to make sure they're there
-		vectors.aliases3d.forEach((aliases) => {
-			aliases.names.forEach((name) => {
-				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
-			});
-		});
-		vectors.aliasCombos2d.concat(vectors.aliasCombos3d).forEach((combo) => {
-			let name = combo.join("");
-			vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
-		});
-	});
 	it("should produce a copy of itself when multiplied by an identity matrix", function() {
 		let vec = vectors.vec3(7,4,13);
 		let matrix = matrices.create(3,3,[1,0,0, 0,1,0, 0,0,1]);
-		matrix.dot(vec).toArray().should.eql([7,4,13]);
+		toArray(matrices.dot(matrix, vec)).should.eql([7,4,13]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec3(7,4,5);
 		let matrix = matrices.create(3,3,[2,0,0, 0,2,0, 0,0,2]);
-		matrix.dot(vec).toArray().should.eql([14,8,10]);
+		toArray(matrices.dot(matrix, vec)).should.eql([14,8,10]);
 	});
 	it("should be translated by a translation matrix", function() {
 		let vec = vectors.vec3(7,4,5);
 		let matrix = matrices.create(4,4,[1,0,0,-9, 0,1,0,4, 0,0,1,-6, 0,0,0,1]);
-		matrix.dot(vec.homogenous()).toArray().should.eql([-2,8,-1,1]);
+		toArray(matrices.dot(matrix, vectors.homogenous(vec))).should.eql([-2,8,-1,1]);
 	});
 });
 describe("a 4d vector", function() {
 	it("should create a vector [0,0,0,0] when given no arguments", function() {
 		let vec = vectors.vec4();
-		vec.toArray().should.eql([0,0,0,0]);
+		toArray(vec).should.eql([0,0,0,0]);
 		vec.rows.should.eql(4);
 		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 4", function() {
 		let initial = [1,2,3,4];
 		let vec = vectors.vec4(initial);
-		vec.toArray().should.eql(initial);
+		toArray(vec).should.eql(initial);
 	});
 	it("should create a populated vector when given four arguments", function() {
 		let vec = vectors.vec4(5,6,7,8);
-		vec.toArray().should.eql([5,6,7,8]);
+		toArray(vec).should.eql([5,6,7,8]);
 	});
 	it("should create a 4d vector from a combination of vector-like objects and remaining components", function() {
 		let vec = vectors.vec4([0,1], 1, 3);
-		vec.toArray().should.eql([0,1,1,3]);
+		toArray(vec).should.eql([0,1,1,3]);
 		vec = vectors.vec4(vectors.vec3(4,3,6),7);
-		vec.toArray().should.eql([4,3,6,7]);
+		toArray(vec).should.eql([4,3,6,7]);
 		vec = vectors.vec4(vectors.vec2(4,3), [2,2]);
-		vec.toArray().should.eql([4,3,2,2]);
+		toArray(vec).should.eql([4,3,2,2]);
 		vec = vectors.vec4(matrices.create(1,2, [0,5]), 3, 2);
-		vec.toArray().should.eql([0,5,3,2]);
-		let vecb = vectors.vec3([9,7,2]);
-		vec = vectors.vec4(vecb.x, vecb.y, vecb.yz);
-		vec.toArray().should.eql([9,7,7,2]);
+		toArray(vec).should.eql([0,5,3,2]);
+		vec = vectors.vec4([9], [7], [7,2]);
+		toArray(vec).should.eql([9,7,7,2]);
 	});
 	it("should create vectors with pre-supplied buffers", function() {
 		let buffer, vec;
 		buffer = new ArrayBuffer(4*4);
 		vec = vectors.vec4(buffer); // with only buffer 
-		vec.toArray().should.eql([0,0,0,0]);
+		toArray(vec).should.eql([0,0,0,0]);
 		vec.buffer.should.eql(buffer);
 		buffer = new ArrayBuffer(4*4+4);
 		vec = vectors.vec4(buffer, 4); // with buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(4*4+4);
 		vec.byteLength.should.eql(4*4);
-		vec.toArray().should.eql([0,0,0,0]);
+		toArray(vec).should.eql([0,0,0,0]);
 		vec = vectors.vec4([4.3, 0.1, 2.2, 4.4], buffer, 4); // with values, buffer and offset 
 		vec.buffer.should.eql(buffer);
 		vec.buffer.byteLength.should.eql(4*4+4);
 		vec.byteLength.should.eql(4*4);
-		vec.toArray().should.be.nearly([4.3,0.1,2.2,4.4], 1e-6);
+		toArray(vec).should.be.nearly([4.3,0.1,2.2,4.4], 1e-6);
 	});
 	it("should throw an error when given any other number of arguments", function() {
 		(function() {vectors.vec2(1, 2, 3, 4, 5)}).should.throwError();
 	});
-	it("should have all the 4d vector aliases", function() {
-		let vec = vectors.vec4([1,2,3,4]);
-		vec.x.should.equal(1);
-		vec.y.should.equal(2);
-		vec.z.should.equal(3);
-		// test a few of them just to make sure the mapping is good
-		vec.xyzw.toArray().should.eql([1,2,3,4]);
-		vec.zyxw.toArray().should.eql([3,2,1,4]);
-		vec.rgba.toArray().should.eql([1,2,3,4]);
-		vec.rabg.toArray().should.eql([1,4,3,2]);
-		vec.abgr.toArray().should.eql([4,3,2,1]);
-		// skim the rest to make sure they're there
-		vectors.aliases4d.forEach((aliases) => {
-			aliases.names.forEach((name) => {
-				vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
-			});
-		});
-		vectors.aliasCombos2d.concat(vectors.aliasCombos3d, vectors.aliasCombos4d).forEach((combo) => {
-			let name = combo.join("");
-			vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
-		});
-	});
 	it("should produce a copy of itself when multiplied by an identity matrix", function() {
 		let vec = vectors.vec4(7,4,13,-2);
 		let matrix = matrices.create(4,4,[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-		matrix.dot(vec).toArray().should.eql([7,4,13,-2]);
+		toArray(matrices.dot(matrix, vec)).should.eql([7,4,13,-2]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec4(7,4,5,-2);
 		let matrix = matrices.create(4,4,[2,0,0,0, 0,2,0,0, 0,0,2,0, 0,0,0,2]);
-		matrix.dot(vec).toArray().should.eql([14,8,10,-4]);
+		toArray(matrices.dot(matrix, vec)).should.eql([14,8,10,-4]);
 	});
 	it("should be translated by a translation matrix", function() {
 		let vec = vectors.vec4(7,4,5,-2);
 		let matrix = matrices.create(5,5,[1,0,0,0,-9, 0,1,0,0,4, 0,0,1,0,-6, 0,0,0,1,17, 0,0,0,0,1]);
-		matrix.dot(vec.homogenous()).toArray().should.eql([-2,8,-1,15,1]);
+		toArray(matrices.dot(matrix, vectors.homogenous(vec))).should.eql([-2,8,-1,15,1]);
 	});
 });
+/*
 describe("vector methods", function() {
 	it("should return the correct types for vector products", function() {
+		let times = vectors.times;
 		let vec2 = vectors.vec2([1,1]);
 		let vec3 = vectors.vec3([1,1,1]);
 		let vec4 = vectors.vec4([1,1,1,1]);
 		let scalar = 2;
-		vec3.times(vec3).should.eql(3);
-		vec2.times(scalar).should.deepEqual(vectors.vec2([2,2]));
-		vec3.times(scalar).should.deepEqual(vectors.vec3([2,2,2]));
-		vec4.times(scalar).should.deepEqual(vectors.vec4([2,2,2,2]));
+		times(vec3, vec3).should.eql(3);
+		times(vec2, scalar).should.deepEqual(Float32Array.of(2,2));
+		times(vec3, scalar).should.deepEqual(Float32Array.of(2,2,2));
+		times(vec4, scalar).should.deepEqual(Float32Array.of(2,2,2,2));
 	});
 	it("should return vectors from normalize", function() {
 		let vec2 = vectors.vec2([21, 4]);
@@ -558,5 +504,293 @@ describe("vector methods", function() {
 		vectors.vec2([13,1]).toString().should.eql("vec2(13.00, 1.00)");
 		vectors.vec3([13,1,22]).toString().should.eql("vec3(13.00, 1.00, 22.00)");
 		vectors.vec4([13,1,22,123]).toString().should.eql("vec4(13.00, 1.00, 22.00, 123.00)");
+	});
+});
+*/
+describe("a wrapped 2d vector", function() {
+	it("should have all the 2d vector aliases", function() {
+		function checkAliases(vec) {
+			vec.x.should.equal(1);
+			vec.y.should.equal(2);
+			vectors.aliases2d.forEach((aliases) => {
+				aliases.names.forEach((name) => {
+					vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+				});
+			});
+			vectors.aliasCombos2d.forEach((combo) => {
+				let name = combo.join("");
+				vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
+			});
+		}
+		let vec = vectors.wrap(vectors.vec2([1,2]));
+		checkAliases(vec);
+	});
+	it("should have all the common vector and matrix functions as working methods", function() {
+		let wrap = vectors.wrap;
+		let mat = matrices.wrap(matrices.create(2,2, [-5,2,1,4]));
+		function checkMethods(vec) {
+			vec.toArray.should.be.a.Function();
+			vec.toArray().should.eql([-5,2]);
+			vec.toString.should.be.a.Function();
+			vec.toString().should.eql("vec2(-5.00, 2.00)");
+			vec.col.should.be.a.Function();
+			toArray(vec.col(0)).should.eql([-5,2]);
+			vec.row.should.be.a.Function();
+			toArray(vec.row(1)).should.eql([2]);
+			vec.plus.should.be.a.Function();
+			toArray(vec.plus(3)).should.eql([-2,5]);
+			vec.minus.should.be.a.Function();
+			toArray(vec.minus(3)).should.eql([-8,-1]);
+			vec.dot.should.be.a.Function();
+			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.cross.should.be.a.Function();
+			toArray(vec.cross(Float32Array.of(-3,7))).should.eql(
+				toArray(vectors.cross(vec, Float32Array.of(-3,7)))
+			);
+			vec.homogenous.should.be.a.Function();
+			toArray(vec.homogenous()).should.eql([-5,2,1]);
+			vec.times.should.be.a.Function();
+			toArray(vec.times(3)).should.eql([-15,6]);
+			vec.normalize.should.be.a.Function();
+			toArray(vec.normalize()).should.be.nearly([-0.928476,0.371391], 1.0e-6);
+			vec.clamp.should.be.a.Function();
+			toArray(vec.clamp(1, 1)).should.eql([1,1]);
+			vec.magnitude.should.be.a.Function();
+			vec.magnitude().should.eql(vectors.magnitude(vec));
+			vec.angle.should.be.a.Function();
+			vec.angle([13,6]).should.eql(vectors.angle(vec, [13,6]));
+			vec.distance.should.be.a.Function();
+			vec.distance([1,3]).should.eql(vectors.distance(vec,[1,3]));
+
+			// if it returns an equal value vector in these interpolations it's doing what it's
+			// supposed to, we assume
+			vec.lerp.should.be.a.Function();
+			toArray(vec.lerp(vec, 1)).should.eql([-5,2]);
+			vec.cubic.should.be.a.Function();
+			toArray(vec.cubic(vec, vec, vec, 1)).should.eql([-5,2]);
+
+			// mutables
+			vec.mut_times.should.be.a.Function();
+			vec.mut_times(3);
+			toArray(vec).should.eql([-15,6]);
+			vec.mut_clamp.should.be.a.Function();
+			vec.mut_clamp(-5,2);
+			toArray(vec).should.eql([-5,2]);
+			vec.mut_copy.should.be.a.Function();
+			vec.mut_copy([1,2]);
+			toArray(vec).should.eql([1,2]);
+			vec.mut_normalize.should.be.a.Function();
+			vec.mut_normalize();
+			toArray(vec).should.be.nearly([0.4472135,0.8944271], 1.0e-6);
+			vec.mut_lerp.should.be.a.Function();
+			vec.mut_lerp(vec, 1);
+			toArray(vec).should.be.nearly([0.4472135,0.8944271], 1.0e-6);
+			vec.mut_cubic.should.be.a.Function();
+			vec.mut_cubic(vec, vec, vec, 1);
+			toArray(vec).should.be.nearly([0.4472135,0.8944271], 1.0e-6);
+		}
+		let vec = wrap(Float32Array.of(-5, 2));
+		checkMethods(vec);
+		vec = wrap(vectors.vec2(-5, 2));
+		checkMethods(vec);
+		vec = wrap([-5, 2]);
+		checkMethods(vec);
+	});
+});
+describe("a wrapped 3d vector", function() {
+	it("should have all the 3d vector aliases", function() {
+		// test a few of them just to make sure the mapping is good
+		function checkAliases(vec) {
+			vec.x.should.equal(1);
+			vec.y.should.equal(2);
+			vec.z.should.equal(3);
+			toArray(vec.yz).should.eql([2,3]);
+			toArray(vec.xyz).should.eql([1,2,3]);
+			toArray(vec.zyx).should.eql([3,2,1]);
+			toArray(vec.rgb).should.eql([1,2,3]);
+			toArray(vec.rbg).should.eql([1,3,2]);
+			toArray(vec.bgr).should.eql([3,2,1]);
+			// skim the rest to make sure they're there
+			vectors.aliases3d.forEach((aliases) => {
+				aliases.names.forEach((name) => {
+					vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+				});
+			});
+			vectors.aliasCombos2d.concat(vectors.aliasCombos3d).forEach((combo) => {
+				let name = combo.join("");
+				vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
+			});
+		}
+		let vec = vectors.wrap(vectors.vec3([1,2,3]));
+		checkAliases(vec);
+	});
+	it("should have all the common vector and matrix functions as working methods", function() {
+		let wrap = vectors.wrap;
+		let mat = matrices.wrap(matrices.create(3,3, [-5,2,6,1,4,2]));
+		function checkMethods(vec) {
+			vec.toArray.should.be.a.Function();
+			vec.toArray().should.eql([-5,2,1]);
+			vec.toString.should.be.a.Function();
+			vec.toString().should.eql("vec3(-5.00, 2.00, 1.00)");
+			vec.col.should.be.a.Function();
+			toArray(vec.col(0)).should.eql([-5,2,1]);
+			vec.row.should.be.a.Function();
+			toArray(vec.row(2)).should.eql([1]);
+			vec.plus.should.be.a.Function();
+			toArray(vec.plus(3)).should.eql([-2,5,4]);
+			vec.minus.should.be.a.Function();
+			toArray(vec.minus(3)).should.eql([-8,-1,-2]);
+			vec.dot.should.be.a.Function();
+			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.cross.should.be.a.Function();
+			toArray(vec.cross(Float32Array.of(-3,7,3))).should.eql(
+				toArray(vectors.cross(vec, Float32Array.of(-3,7,3)))
+			);
+			vec.homogenous.should.be.a.Function();
+			toArray(vec.homogenous()).should.eql([-5,2,1,1]);
+			vec.times.should.be.a.Function();
+			toArray(vec.times(3)).should.eql([-15,6,3]);
+			vec.normalize.should.be.a.Function();
+			toArray(vec.normalize()).should.be.nearly([-0.912870,0.365148,0.182574], 1.0e-6);
+			vec.clamp.should.be.a.Function();
+			toArray(vec.clamp(1, 1)).should.eql([1,1,1]);
+			vec.magnitude.should.be.a.Function();
+			vec.magnitude().should.eql(vectors.magnitude(vec));
+			vec.angle.should.be.a.Function();
+			vec.angle([13,6,2]).should.eql(vectors.angle(vec, [13,6,2]));
+			vec.distance.should.be.a.Function();
+			vec.distance([1,3,7]).should.eql(vectors.distance(vec,[1,3,7]));
+
+			// if it returns an equal value vector in these interpolations it's doing what it's
+			// supposed to, we assume
+			vec.lerp.should.be.a.Function();
+			toArray(vec.lerp(vec, 1)).should.eql([-5,2,1]);
+			vec.cubic.should.be.a.Function();
+			toArray(vec.cubic(vec, vec, vec, 1)).should.eql([-5,2,1]);
+
+			// mutables
+			vec.mut_times.should.be.a.Function();
+			vec.mut_times(3);
+			toArray(vec).should.eql([-15,6,3]);
+			vec.mut_clamp.should.be.a.Function();
+			vec.mut_clamp(-5,2);
+			toArray(vec).should.eql([-5,2,2]);
+			vec.mut_copy.should.be.a.Function();
+			vec.mut_copy([1,2,7]);
+			toArray(vec).should.eql([1,2,7]);
+			vec.mut_normalize.should.be.a.Function();
+			vec.mut_normalize();
+			toArray(vec).should.be.nearly([0.136082,0.272165,0.952579], 1.0e-6);
+			vec.mut_lerp.should.be.a.Function();
+			vec.mut_lerp(vec, 1);
+			toArray(vec).should.be.nearly([0.136082,0.272165,0.952579], 1.0e-6);
+			vec.mut_cubic.should.be.a.Function();
+			vec.mut_cubic(vec, vec, vec, 1);
+			toArray(vec).should.be.nearly([0.136082,0.272165,0.952579], 1.0e-6);
+		}
+		let vec = wrap(Float32Array.of(-5, 2, 1));
+		checkMethods(vec);
+		vec = wrap(vectors.vec3(-5, 2, 1));
+		checkMethods(vec);
+		vec = wrap([-5, 2, 1]);
+		checkMethods(vec);
+	});
+});
+describe("a wrapped 4d vector", function() {
+	it("should have all the 4d vector aliases", function() {
+		function checkAliases(vec) {
+			vec.x.should.equal(1);
+			vec.y.should.equal(2);
+			vec.z.should.equal(3);
+			// test a few of them just to make sure the mapping is good
+			toArray(vec.xyzw).should.eql([1,2,3,4]);
+			toArray(vec.zyxw).should.eql([3,2,1,4]);
+			toArray(vec.rgba).should.eql([1,2,3,4]);
+			toArray(vec.rabg).should.eql([1,4,3,2]);
+			toArray(vec.abgr).should.eql([4,3,2,1]);
+			// skim the rest to make sure they're there
+			vectors.aliases4d.forEach((aliases) => {
+				aliases.names.forEach((name) => {
+					vec.hasOwnProperty(name).should.eql(true, "has alias "+name);
+				});
+			});
+			vectors.aliasCombos2d.concat(vectors.aliasCombos3d, vectors.aliasCombos4d).forEach((combo) => {
+				let name = combo.join("");
+				vec.hasOwnProperty(name).should.eql(true, "has alias combo "+name);
+			});
+		}
+		let vec = vectors.wrap(vectors.vec4([1,2,3,4]));
+		checkAliases(vec);
+	});
+	it("should have all the common vector and matrix functions as working methods", function() {
+		let wrap = vectors.wrap;
+		let mat = matrices.wrap(matrices.create(4,4, [-5,2,6,2,1,4,2,7]));
+		function checkMethods(vec) {
+			vec.toArray.should.be.a.Function();
+			vec.toArray().should.eql([-5,2,1,7]);
+			vec.toString.should.be.a.Function();
+			vec.toString().should.eql("vec4(-5.00, 2.00, 1.00, 7.00)");
+			vec.col.should.be.a.Function();
+			toArray(vec.col(0)).should.eql([-5,2,1,7]);
+			vec.row.should.be.a.Function();
+			toArray(vec.row(2)).should.eql([1]);
+			vec.plus.should.be.a.Function();
+			toArray(vec.plus(3)).should.eql([-2,5,4,10]);
+			vec.minus.should.be.a.Function();
+			toArray(vec.minus(3)).should.eql([-8,-1,-2,4]);
+			vec.dot.should.be.a.Function();
+			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.homogenous.should.be.a.Function();
+			toArray(vec.homogenous()).should.eql([-5,2,1,7,1]);
+			vec.times.should.be.a.Function();
+			toArray(vec.times(3)).should.eql([-15,6,3,21]);
+			vec.normalize.should.be.a.Function();
+			toArray(vec.normalize()).should.be.nearly(
+				[-0.562543,0.225017,0.112508,0.787561], 1.0e-6);
+			vec.clamp.should.be.a.Function();
+			toArray(vec.clamp(1, 1)).should.eql([1,1,1,1]);
+			vec.magnitude.should.be.a.Function();
+			vec.magnitude().should.eql(vectors.magnitude(vec));
+			vec.angle.should.be.a.Function();
+			vec.angle([13,6,2,-2]).should.eql(vectors.angle(vec, [13,6,2,-2]));
+			vec.distance.should.be.a.Function();
+			vec.distance([1,3,7,11]).should.eql(vectors.distance(vec,[1,3,7,11]));
+
+			// if it returns an equal value vector in these interpolations it's doing what it's
+			// supposed to, we assume
+			vec.lerp.should.be.a.Function();
+			toArray(vec.lerp(vec, 1)).should.eql([-5,2,1,7]);
+			vec.cubic.should.be.a.Function();
+			toArray(vec.cubic(vec, vec, vec, 1)).should.eql([-5,2,1,7]);
+
+			// mutables
+			vec.mut_times.should.be.a.Function();
+			vec.mut_times(3);
+			toArray(vec).should.eql([-15,6,3,21]);
+			vec.mut_clamp.should.be.a.Function();
+			vec.mut_clamp(-5,2);
+			toArray(vec).should.eql([-5,2,2,2]);
+			vec.mut_copy.should.be.a.Function();
+			vec.mut_copy([1,2,7,11]);
+			toArray(vec).should.eql([1,2,7,11]);
+			vec.mut_normalize.should.be.a.Function();
+			vec.mut_normalize();
+			toArray(vec).should.be.nearly(
+				[0.075592,0.151185,0.529150,0.831521], 1.0e-6);
+			vec.mut_lerp.should.be.a.Function();
+			vec.mut_lerp(vec, 1);
+			toArray(vec).should.be.nearly(
+				[0.075592,0.151185,0.529150,0.831521], 1.0e-6);
+			vec.mut_cubic.should.be.a.Function();
+			vec.mut_cubic(vec, vec, vec, 1);
+			toArray(vec).should.be.nearly(
+				[0.075592,0.151185,0.529150,0.831521], 1.0e-6);
+		}
+		let vec = wrap(Float32Array.of(-5, 2, 1, 7));
+		checkMethods(vec);
+		vec = wrap(vectors.vec4(-5, 2, 1, 7));
+		checkMethods(vec);
+		vec = wrap([-5, 2, 1, 7]);
+		checkMethods(vec);
 	});
 });

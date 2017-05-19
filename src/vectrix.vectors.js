@@ -554,7 +554,7 @@ export const cross = (function() {
 	let scratchb = new Float32Array(3);
 	return function cross(a, b, out) {
 		if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
-		out = out||new Float32Array(3);
+		out = out||create(3);
 		mut_copy(scratcha.fill(0), a);
 		mut_copy(scratchb.fill(0), b);
 		out[0] = scratcha[1]*scratchb[2] - scratcha[2]*scratchb[1];
@@ -611,7 +611,7 @@ export function mut_clamp(a, min, max) {
  * @param {vector} a operand
  * @return {float} magnitude of a
  */
-export const magnitude = (() => {
+export const magnitude = (function() {
 	let scratch = 0.0, i = 0|0, len = 0|0;
 	return function magnitude(a) {
 		scratch = 0.0;
@@ -680,16 +680,39 @@ export function create() {
 		else {
 			vec = matrices.create(params[0], 1, params.slice(1), buffer, offset);
 		}
+
+		vec.wrap = asMethod(wrap, vec);
+		vec.toString = asMethod(toString, vec);
 	}
+	return vec;
+}
+
+/**
+ * Wraps a vector or array-like object with vector functions as methods.
+ * @param {array-like} vec the vector to wrap
+ * @return {vector} the wrapped vector
+ */
+export function wrap(vec) {
 	// define vector-specific methods
+	matrices.wrap(vec, vec.length, 1);
+	vec.toString = asMethod(toString, vec);
 	vec.homogenous = asMethod(homogenous, vec);
 	vec.times = asMethod(times, vec);
-	vec.normalize = asMethod(normalize, vec);
 	vec.lerp = asMethod(lerp, vec);
 	vec.cubic = asMethod(cubic, vec);
-	vec.angle = asMethod(angle, vec);
-	vec.distance = asMethod(distance, vec);
-	vec.toString = asMethod(toString, vec);
+	vec.clamp = asMethod(clamp, vec);
+	vec.angle = angle.bind(null, vec);
+	vec.magnitude = magnitude.bind(null, vec);
+	vec.distance = distance.bind(null, vec);
+	vec.normalize = asMethod(normalize, vec);
+	vec.mut_normalize = asMethod(mut_normalize, vec);
+	vec.mut_times = asMethod(mut_times, vec);
+	vec.mut_lerp = asMethod(mut_lerp, vec);
+	vec.mut_cubic = asMethod(mut_cubic, vec);
+	vec.mut_clamp = asMethod(mut_clamp, vec);
+	vec.mut_copy = asMethod(mut_copy, vec);
+	if(vec.length === 2 || vec.length === 3) vec.cross = asMethod(cross, vec);
+	defineAliases(vec);
 	return vec;
 }
 
@@ -700,8 +723,6 @@ export function create() {
  */
 export const vec2 = create.vec2 = function() {
 	let vec = create.apply(null, [2].concat(Array.prototype.slice.apply(arguments)));
-	vec.cross = asMethod(cross, vec);
-	defineAliases(vec);
 	return vec;
 }
 
@@ -712,8 +733,6 @@ export const vec2 = create.vec2 = function() {
  */
 export const vec3 = create.vec3 = function() {
 	let vec = create.apply(null, [3].concat(Array.prototype.slice.apply(arguments)));
-	vec.cross = asMethod(cross, vec);
-	defineAliases(vec);
 	return vec;
 }
 
@@ -724,6 +743,5 @@ export const vec3 = create.vec3 = function() {
  */
 export const vec4 = create.vec4 = function() {
 	let vec = create.apply(null, [4].concat(Array.prototype.slice.apply(arguments)));
-	defineAliases(vec);
 	return vec;
 }
