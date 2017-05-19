@@ -341,13 +341,18 @@ export function create(rows, cols, values = [], buffer = undefined, offset = 0) 
 	matrix.cols = cols;
 	if(vals.length) matrix.set(vals);
 	else matrix.fill(0.0); // just in case it was a previously used buffer
+	matrix.toArray = toArray.bind(null, matrix);
+	matrix.toString = toString.bind(null, matrix);
+	matrix.col = col.bind(null, matrix);
+	matrix.row = row.bind(null, matrix);
+	matrix.wrap = wrap.bind(null, matrix);
+	return matrix;
+}
+
+export function wrap(matrix) {
 	matrix.plus = plus.bind(null, matrix);
 	matrix.minus = minus.bind(null, matrix);
 	matrix.dot = dot.bind(null, matrix);
-	matrix.col = col.bind(null, matrix);
-	matrix.row = row.bind(null, matrix);
-	matrix.toArray = toArray.bind(null, matrix);
-	matrix.toString = toString.bind(null, matrix);
 	return matrix;
 }
 

@@ -62,11 +62,12 @@ describe("an arbitrary matrix", function() {
 		matrices.plus(mat1,mat2,out).should.equal(out);
 	});
 	it("should add scalars to matrices", function() {
+		let plus = matrices.plus;
 		let mat1 = matrices.create(3,3).fill(4);
-		mat1.plus(2).toArray().should.eql(new Array(9).fill(6));
+		plus(mat1, 2).toArray().should.eql(new Array(9).fill(6));
 		let out = matrices.create(3,3);
 		// support for out params
-		matrices.plus(mat1,2,out).should.equal(out);
+		plus(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during an add", function() {
 		let plus = matrices.plus;
@@ -117,16 +118,17 @@ describe("an arbitrary matrix", function() {
 		matrices.minus(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during a subtract", function() {
+		let minus = matrices.minus;
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
-		let out1 = mat1.minus(mat2);
-		let out2 = out1.minus(mat1);
+		let out1 = minus(mat1, mat2);
+		let out2 = minus(out1, mat1);
 		mat1.toArray().should.eql([1,1,1,1]);
 		mat2.toArray().should.eql([2,2,2,2]);
 		out1.toArray().should.eql([-1,-1,-1,-1]);
 		out2.toArray().should.eql([-2,-2,-2,-2]);
 		let scalar = 2;
-		mat1.minus(scalar);
+		minus(mat1, scalar);
 		scalar.should.eql(2);
 	});
 	it("should mutate its first operand during a mutating subtract", function() {
@@ -148,13 +150,14 @@ describe("an arbitrary matrix", function() {
 		scalar.should.eql(2);
 	});
 	it("should reject unlike matrices during add and subtract", function() {
+		let plus = matrices.plus, minus = matrices.minus;
 		let mat1 = matrices.create(2,3,[3,3,3,3,3,3]);
 		let mat2 = matrices.create(3,2,[3,3,3,3,3,3]);
 		let mat3 = matrices.create(1,4,[1,1,1,1]);
-		(mat1.plus(mat2) === undefined).should.eql(true);
-		(mat1.plus(mat3) === undefined).should.eql(true);
-		(mat1.minus(mat2) === undefined).should.eql(true);
-		(mat1.minus(mat3) === undefined).should.eql(true);
+		(plus(mat1, mat2) === undefined).should.eql(true);
+		(plus(mat1, mat3) === undefined).should.eql(true);
+		(minus(mat1, mat2) === undefined).should.eql(true);
+		(minus(mat1, mat3) === undefined).should.eql(true);
 	});
 	it("should find the dot product of two compatible matrices", function() {
 		let dot = matrices.dot, 
@@ -188,9 +191,16 @@ describe("an arbitrary matrix", function() {
 		matrices.dot(mat4,3,out).should.equal(out);
 	});
 	it("should reject incompatible matrices", function() {
+		let dot = matrices.dot;
 		let mat1 = matrices.create(1,3);
 		let mat2 = matrices.create(1,3);
-		(mat1.dot(mat2) === undefined).should.eql(true);
+		(dot(mat1, mat2) === undefined).should.eql(true);
+	});
+	it("should wrap a matrix with vectrix methods", function() {
+		let mat = matrices.create(3,1,[-5,2,1]).wrap();
+		mat.plus.should.be.a.Function();
+		mat.minus.should.be.a.Function();
+		mat.dot.should.be.a.Function();
 	});
 });
 
