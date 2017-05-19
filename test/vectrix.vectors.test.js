@@ -91,6 +91,10 @@ describe("vector functions", function() {
 		normalize(vec2).should.be.nearly(Float32Array.of(0.982339, 0.187112), 1.0e-6);
 		normalize(vec3).should.be.nearly(Float32Array.of(0.267261, 0.534522, 0.801784), 1.0e-6);
 		normalize(vec4).should.be.nearly(Float32Array.of(0.134984, 0.776157, 0.615864, 0.00843649), 1.0e-6);
+		// out param support
+		let out = vectors.create.vec4();
+		normalize(vec4, out).should.be.nearly(Float32Array.of(0.134984, 0.776157, 0.615864, 0.00843649), 1.0e-6);
+		normalize(vec4, out).should.equal(out);
 	});
 	it("should perform linear interpolations correctly on like vectors", function() {
 		let lerp = vectors.lerp;

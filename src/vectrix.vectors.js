@@ -329,12 +329,25 @@ export function homogenous(a) {
  *
  * @function normalize
  * @param {vector} a vector to normalize
+ * @param {vector} out (optional) a vector of the same dimensions as a
  * @return {vector}
  */
-export function normalize(a) {
-	let sum = a.map((cur) => cur*cur).reduce((prev, cur) => prev+cur, 0);
-	return a.map((cur) => cur*1/sqrt(sum));
-}
+export const normalize = (function() {
+	let sum = 0.0, cur = 0.0, i = 0|0, len = 0|0;
+	return function normalize(a, out = undefined) {
+		len = a.length;
+		sum = 0.0;
+		out = out||create(len);
+		for(i = 0|0; i < len; ++i) {
+			cur = a[i]; // cut out one reference
+			sum += cur*cur;
+		}
+		for(i = 0|0; i < len; ++i) {
+			out[i] = a[i]/sqrt(sum);
+		}
+		return out;
+	}
+})();
 
 /**
  * Perform a linear interpolation between two vectors.
