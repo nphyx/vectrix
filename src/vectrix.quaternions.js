@@ -23,6 +23,7 @@ q.zw; // [2.1, 1.0]
 
 import * as vectors from "./vectrix.vectors";
 const vecNrm = vectors.normalize;
+const {abs, sin, cos, acos, sqrt} = Math;
 
 /**
  * @private
@@ -79,56 +80,6 @@ function defineAliases(q) {
 	}
 }
 
-
-/**
- * Performs a spherical linear interpolation between a and b.
- * @example
- * let q1 = quaternions.create([0.3,-0.6,-0.4,0.2]);
- * let q2 = quaternions.create([0.6,0.8,0.5,0.7]);
- * slerp(q1, q2, 0.4); // quaternion(0.75, 0.01, -0.02, 0.72);
- * @param {quaternion|array(4)} origin quaternion
- * @param {quaternion|array(4)} destination quaternion
- * @param {float} t interval [0...1]
- * @return {quaternion}
- */ 
-function slerp(a, b, t) {
-	let ax = a[0], bx = b[0], ay = a[1], by = b[1], 
-	    az = a[2], bz = b[2], aw = a[3], bw = b[3];
-	let cosHalfTheta = ax * bx + ay * by + az * bz + aw * bw;
-	if (Math.abs(cosHalfTheta) >= 1.0) {
-		return create([ax, ay, az, aw]);
-	}
-	let halfTheta = Math.acos(cosHalfTheta);
-	let sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta * cosHalfTheta);
-	let ratioA = Math.sin((1 - t) * halfTheta) / sinHalfTheta;
-	let ratioB = Math.sin(t * halfTheta) / sinHalfTheta;
-
-	return create([
-		(ax * ratioA + bx * ratioB),
-		(ay * ratioA + by * ratioB),
-		(az * ratioA + bz * ratioB),
-		(aw * ratioA + bw * ratioB)
-	]);
-}
-
-/**
- * Finds the inverse of a quaternion by normalizing then inverting the quat. Normalization
- * can be skipped by setting normalize = false if the quat is known to be normal already.
- * Be careful, since floating point errors will often de-normalize your quats!
- * @example
- * // functional
- * quaternions.invert([4.0,7.0,5.0,1.0]); // quaternion(-0.36, -0.89, -0.27, 0.09)
- * // OO
- * quaternions.create([4.0,7.0,5.0,1.0]).invert(); // quaternion(-0.36, -0.89, -0.27, 0.09)
- * @param {quaternion|array(4)} a the input quaternion
- * @param {bool} normalize (default true)
- * @return {quaternion}
- */
-function invert(a, normalize = true) {
-	if(normalize) a = a.normalize();
-	return create([-a[0], -a[1], -a[2], a[3]]);
-}
-
 /**
  * Create a string representation of a quaternion.
  * @example
@@ -145,6 +96,54 @@ export function quatToString(a) {
 }
 
 /**
+ * Performs a spherical linear interpolation between a and b.
+ * @example
+ * let q1 = quaternions.create([0.3,-0.6,-0.4,0.2]);
+ * let q2 = quaternions.create([0.6,0.8,0.5,0.7]);
+ * slerp(q1, q2, 0.4); // quaternion(0.75, 0.01, -0.02, 0.72);
+ * @param {quaternion|array(4)} a origin quaternion
+ * @param {quaternion|array(4)} b destination quaternion
+ * @param {float} t interval [0...1]
+ * @return {quaternion}
+ */ 
+export const slerp = (function() {
+	let ax = 0.0, bx = 0.0, ay = 0.0, by = 0.0,
+		  az = 0.0, bz = 0.0, aw = 0.0, bw = 0.0,
+			cosHalfTheta = 0.0, sinHalfTheta = 0.0,
+			halfTheta = 0.0,
+			ratioA = 0.0, ratioB = 0.0;
+	return function slerp(a, b, t, out = undefined) {
+		ax = a[0];
+		bx = b[0];
+		ay = a[1];
+		by = b[1];
+		az = a[2];
+		bz = b[2];
+		aw = a[3];
+		bw = b[3];
+		cosHalfTheta = ax * bx + ay * by + az * bz + aw * bw;
+		out = out||create();
+		if (abs(cosHalfTheta) >= 1.0) {
+			out[0] = ax;
+			out[1] = ay;
+			out[2] = az;
+			out[3] = aw;
+			return out;
+		}
+		halfTheta = acos(cosHalfTheta);
+		sinHalfTheta = sqrt(1.0 - cosHalfTheta * cosHalfTheta);
+		ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
+		ratioB = sin(t * halfTheta) / sinHalfTheta;
+
+		out[0] = ax * ratioA + bx * ratioB;
+		out[1] = ay * ratioA + by * ratioB;
+		out[2] = az * ratioA + bz * ratioB;
+		out[3] = aw * ratioA + bw * ratioB;
+		return out;
+	}
+})();
+
+/**
  * Normalize a quaternion.
  * @example
  * // functional style
@@ -152,11 +151,42 @@ export function quatToString(a) {
  * // OO style
  * quaternions.create([4.0, 10.0, 3.0, 1.0]).normalize(); // quaternion(0.36, 0.89, 0.27, 0.09);
  * @param {quaternion|array(4)} a quaternion to normalize
+ * @param {quaternion} out (optional) out parameter
  * @return {quaternion}
  */
-function normalize(a) {
-	return create(vecNrm(a));
+export function normalize(a, out = undefined) {
+	// this function only exists to override the out parameter, so pass down
+	// to the vector version of normalize afterward
+	out = out||create();
+	let out2 = vecNrm(a, out);
+	return out2;
 }
+
+/**
+ * Finds the inverse of a quaternion by normalizing then inverting the quat. Normalization
+ * can be skipped by setting normalize = false if the quat is known to be normal already.
+ * Be careful, since floating point errors will often de-normalize your quats!
+ * @example
+ * // functional
+ * quaternions.invert([4.0,7.0,5.0,1.0]); // quaternion(-0.36, -0.89, -0.27, 0.09)
+ * // OO
+ * quaternions.create([4.0,7.0,5.0,1.0]).invert(); // quaternion(-0.36, -0.89, -0.27, 0.09)
+ * @param {quaternion|array(4)} a the input quaternion
+ * @param {quaternion} (optional) out out parameter
+ * @param {bool} norm (default true) whether to normalize the quaternion before inverting
+ * @return {quaternion}
+ */
+export const invert = (function() {
+	return function invert(a, norm = true, out = undefined) {
+		out = out||create();
+		if(norm) normalize(a, out);
+		else out.set(a);
+		out[0] = -out[0];
+		out[1] = -out[1];
+		out[2] = -out[2];
+		return out;
+	}
+})();
 
 /**
  * Factory for creating quaternions. Quaternions are represented as 4 member arrays
@@ -196,7 +226,9 @@ export function create() {
 /**
  * Creates an identity quaternion [0,0,0,1].
  * @example 
- * quaternions.create.identity(); // quaternion(0.00, 0.00, 0.00, 0.01)
+ * quaternions.create.identity(); // quaternion(0.00, 0.00, 0.00, 1.00)
+ * @param {ArrayBuffer} buffer (optional) an array buffer to create the vector on 
+ * @param {offset} offset (optional) offset for the buffer, ignored if buffer is not supplied 
  * @return {quaternion}
  */
 create.identity = function() {
@@ -208,39 +240,54 @@ create.identity = function() {
  * @example
  * quaternions.create.fromEulerAngles([75*Math.PI/180, 65*Math.PI/180, 15*Math.PI/180]); // quaternion(0.412, 0.56, 0.36, 0.62)
  * @param {array(3)} a [yaw,pitch,roll] in radians 
+ * @param {ArrayBuffer} buffer (optional) an array buffer to create the vector on 
+ * @param {offset} offset (optional) offset for the buffer, ignored if buffer is not supplied 
  * @return {quaternion}
  */
-create.fromEulerAngles = function(a) {
-	let yaw = a[0], pitch = a[1], roll = a[2],
-	    c1 = Math.cos(yaw/2),
-	    s1 = Math.sin(yaw/2),
-	    c2 = Math.cos(pitch/2),
-	    s2 = Math.sin(pitch/2),
-	    c3 = Math.cos(roll/2),
-	    s3 = Math.sin(roll/2),
-	    c1c2 = c1*c2,
-	    s1s2 = s1*s2,
-	    x = c1c2*s3 + s1s2*c3,
-	    y = s1*c2*c3 + c1*s2*s3,
-	    z = c1*s2*c3 - s1*c2*s3,
-	    w = c1c2*c3 - s1s2*s3;
-	return create([x,y,z,w]);
-}
+create.fromEulerAngles = (function() {
+	let yawh = 0.0, pitchh = 0.0, rollh = 0.0, c1 = 0.0, s1 = 0.0,
+		c2 = 0.0, s2 = 0.0, c3 = 0.0, s3 = 0.0, c1c2 = 0.0, s1s2 = 0.0;
+	return function(a, buffer = undefined, offset = undefined) {
+		let out = create(buffer, offset);
+		yawh = a[0]/2;
+		pitchh = a[1]/2;
+		rollh = a[2]/2;
+		c1 = cos(yawh);
+		s1 = sin(yawh);
+		c2 = cos(pitchh);
+		s2 = sin(pitchh);
+		c3 = cos(rollh);
+		s3 = sin(rollh);
+		c1c2 = c1*c2;
+		s1s2 = s1*s2;
+		out[0] = c1c2*s3 + s1s2*c3;
+		out[1] = s1*c2*c3 + c1*s2*s3;
+		out[2] = c1*s2*c3 - s1*c2*s3;
+		out[3] = c1c2*c3 - s1s2*s3;
+		return out;
+	}
+})();
 
 /**
  * Creates a quaternion from an axis-angle rotation.
- * @param {array(3)} axis of rotation
- * @param {float} angle of rotation as radian
  * @example
  * quaternions.create.fromAxisAngle([1,0,0],90*Math.PI/180); // quaternion(0.70, 0.00, 0.00, 0.70)
+ * @param {array(3)} axis of rotation
+ * @param {float} angle of rotation as radian
+ * @param {ArrayBuffer} buffer (optional) an array buffer to create the vector on 
+ * @param {offset} offset (optional) offset for the buffer, ignored if buffer is not supplied 
  * @return {quaternion}
  */
-create.fromAxisAngle = function(axis, angle) {
-	let a = vectors.normalize(axis);
-	return create([
-			a[0] * Math.sin(angle/2),
-	    a[1] * Math.sin(angle/2),
-	    a[2] * Math.sin(angle/2),
-	    Math.cos(angle/2)
-	]);
-}
+create.fromAxisAngle = (function() {
+	let a = 0.0, angleh = 0.0;
+	return function fromAxisAngle(axis, angle, buffer = undefined, offset = undefined) {
+		let out = create(buffer, offset);
+		a = vecNrm(axis);
+		angleh = angle/2;
+		out[0] = a[0] * sin(angleh);
+		out[1] = a[1] * sin(angleh);
+		out[2] = a[2] * sin(angleh);
+		out[3] = cos(angleh);
+		return out;
+	}
+})();
