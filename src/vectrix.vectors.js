@@ -261,8 +261,8 @@ function defineAliases(vec) {
 /**
  * Turns a vector function into a method by wrapping its result in a create()
  * statement.
- * @param {vector} vector
  * @param {function} method
+ * @param {vector} vector
  * @private
  */
 function asMethod(method, vector) {
@@ -270,10 +270,10 @@ function asMethod(method, vector) {
 		let res = method.apply(null, [vector].concat(Array.prototype.slice.apply(arguments)));
 		if(!(res instanceof Float32Array)) return res;
 		switch(res.length) {
-			case 2: return create.vec2(res);
-			case 3: return create.vec3(res);
-			case 4: return create.vec4(res);
-			default: return create(res.length, res);
+			case 2: return wrap(create.vec2(res));
+			case 3: return wrap(create.vec3(res));
+			case 4: return wrap(create.vec4(res));
+			default: return wrap(create(res.length, res));
 		}
 	}
 }
@@ -690,9 +690,6 @@ export function create() {
 		else {
 			vec = matrices.create(params[0], 1, params.slice(1), buffer, offset);
 		}
-
-		vec.wrap = asMethod(wrap, vec);
-		vec.toString = asMethod(toString, vec);
 	}
 	return vec;
 }
