@@ -22,6 +22,7 @@ q.zw; // [2.1, 1.0]
 */
 
 import * as vectors from "./vectrix.vectors";
+import * as matrices from "./vectrix.matrices";
 const vecNrm = vectors.normalize;
 const {abs, sin, cos, acos, sqrt} = Math;
 
@@ -90,8 +91,8 @@ function defineAliases(q) {
  * @param {quaternion} a quaternion to stringify
  * @return {string}
  */
-export function quatToString(a) {
-	let strings = a.toArray().map((cur) => cur.toFixed(2));
+export function toString(a) {
+	let strings = matrices.toArray(a).map((cur) => cur.toFixed(2));
 	return "quaternion("+strings.join(", ")+")";
 }
 
@@ -215,12 +216,42 @@ export function create() {
 		}
 	}
 	let q = vectors.create.apply(null, [4].concat(params));
-	defineAliases(q);
-	q.slerp = slerp.bind(null, q);
-	q.normalize = normalize.bind(null, q);
-	q.invert = invert.bind(null, q);
-	q.toString = quatToString.bind(null, q);
 	return q;
+}
+
+/**
+ * Wraps a quaternion with aliases and quaternion functions as methods.
+ * @param {quaternion} q quaternion to wrap
+ * @return {quaternion} wrapped quaternion
+ */
+export function wrap(q) {
+	defineAliases(q);
+	matrices.wrap(q);
+	q.slerp = asMethod(slerp, q);
+	q.normalize = asMethod(normalize, q);
+	q.invert = asMethod(invert, q);
+	q.toString = toString.bind(null, q);
+	q.times = asMethod(vectors.times, q);
+	q.clamp = asMethod(vectors.clamp, q);
+	q.normalize = asMethod(vectors.normalize, q);
+	q.mut_normalize = asMethod(vectors.mut_normalize, q);
+	q.mut_times = asMethod(vectors.mut_times, q);
+	q.mut_clamp = asMethod(vectors.mut_clamp, q);
+	q.mut_copy = asMethod(vectors.mut_copy, q);
+	return q;
+}
+
+/**
+ * Turns a quaternion function into a method by wrapping its result.
+ * @param {function} method
+ * @param {quaternion} q 
+ * @private
+ */
+function asMethod(method, q) {
+	return function() {
+		let res = method.apply(null, [q].concat(Array.prototype.slice.apply(arguments)));
+		return wrap(create(res));
+	}
 }
 
 /**
