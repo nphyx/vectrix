@@ -502,10 +502,6 @@ export var times = (function() {
 	}
 })();
 
-times.vec2 = function vec2times(a, b) {
-	return a[0] * b[0] + a[1] * b[1];
-}
-
 /**
  * Mutating version of [times](#times). Note that a is mutated only when a is a vector
  * and b is a scalar.
