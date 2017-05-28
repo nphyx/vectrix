@@ -65,15 +65,15 @@ describe("an arbitrary matrix", function() {
 		matrices.plus(mat1,mat2,out).should.equal(out);
 	});
 	it("should add scalars to matrices", function() {
-		let plus = matrices.plus;
+		let plus_scalar = matrices.plus_scalar;
 		let mat1 = matrices.create(3,3).fill(4);
-		toArray(plus(mat1, 2)).should.eql(new Array(9).fill(6));
+		toArray(plus_scalar(mat1, 2)).should.eql(new Array(9).fill(6));
 		let out = matrices.create(3,3);
 		// support for out params
-		plus(mat1,2,out).should.equal(out);
+		plus_scalar(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during an add", function() {
-		let plus = matrices.plus;
+		let plus = matrices.plus, plus_scalar = matrices.plus_scalar;
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let mat3 = matrices.create(2,2,[1,2,3,4]);
@@ -83,11 +83,11 @@ describe("an arbitrary matrix", function() {
 		toArray(out1).should.eql([3,3,3,3]);
 		toArray(plus(mat1, mat3)).should.eql([2,3,4,5]);
 		let scalar = 2;
-		plus(mat1, scalar);
+		plus_scalar(mat1, scalar);
 		scalar.should.eql(2);
 	});
 	it("should mutate its first operand during a mutating add", function() {
-		let mut_plus = matrices.mut_plus;
+		let mut_plus = matrices.mut_plus, mut_plus_scalar = matrices.mut_plus_scalar;
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let out1 = mut_plus(mat1, mat2);
@@ -99,7 +99,7 @@ describe("an arbitrary matrix", function() {
 		toArray(out2).should.eql([5,5,5,5]);
 		toArray(out1).should.eql([3,3,3,3]);
 		let scalar = 2;
-		out1 = mut_plus(mat1, scalar);
+		out1 = mut_plus_scalar(mat1, scalar);
 		mat1.should.equal(out1);
 		toArray(mat1).should.eql([5,5,5,5]);
 		scalar.should.eql(2);
@@ -115,13 +115,14 @@ describe("an arbitrary matrix", function() {
 		matrices.minus(mat1,mat2,out).should.equal(out);
 	});
 	it("should subtract scalars from matrices", function() {
+		let minus_scalar = matrices.minus_scalar;
 		let mat1 = matrices.create(3,3).fill(4);
-		toArray(matrices.minus(mat1,2)).should.eql(new Array(9).fill(2));
+		toArray(minus_scalar(mat1,2)).should.eql(new Array(9).fill(2));
 		let out = matrices.create(3,3);
-		matrices.minus(mat1,2,out).should.equal(out);
+		minus_scalar(mat1,2,out).should.equal(out);
 	});
 	it("should not mutate any of its operands during a subtract", function() {
-		let minus = matrices.minus;
+		let minus = matrices.minus, minus_scalar = matrices.minus_scalar;
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let out1 = minus(mat1, mat2);
@@ -131,11 +132,11 @@ describe("an arbitrary matrix", function() {
 		toArray(out1).should.eql([-1,-1,-1,-1]);
 		toArray(out2).should.eql([-2,-2,-2,-2]);
 		let scalar = 2;
-		minus(mat1, scalar);
+		minus_scalar(mat1, scalar);
 		scalar.should.eql(2);
 	});
 	it("should mutate its first operand during a mutating subtract", function() {
-		let mut_minus = matrices.mut_minus;
+		let mut_minus = matrices.mut_minus, mut_minus_scalar = matrices.mut_minus_scalar;
 		let mat1 = matrices.create(2,2,[1,1,1,1]);
 		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		let out1 = mut_minus(mat1, mat2);
@@ -147,7 +148,7 @@ describe("an arbitrary matrix", function() {
 		toArray(out2).should.eql([3,3,3,3]);
 		toArray(out1).should.eql([-1,-1,-1,-1]);
 		let scalar = 2;
-		out1 = mut_minus(mat1, scalar);
+		out1 = mut_minus_scalar(mat1, scalar);
 		mat1.should.equal(out1);
 		toArray(mat1).should.eql([-3,-3,-3,-3]);
 		scalar.should.eql(2);
@@ -187,11 +188,12 @@ describe("an arbitrary matrix", function() {
 		toArray(mat2).should.eql([2,2,2,2]);
 	});
 	it("should multiply matrices by scalars", function() {
+		let multiply_scalar = matrices.multiply_scalar;
 		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);
-		toArray(matrices.dot(mat4,3)).should.eql([-6,6, 0,-6, -18,9]);
+		toArray(multiply_scalar(mat4,3)).should.eql([-6,6, 0,-6, -18,9]);
 		// support for out params
 		let out = matrices.create(3,2);
-		matrices.dot(mat4,3,out).should.equal(out);
+		multiply_scalar(mat4,3,out).should.equal(out);
 	});
 	it("should reject incompatible matrices", function() {
 		let dot = matrices.dot;
@@ -201,6 +203,7 @@ describe("an arbitrary matrix", function() {
 	});
 	it("should wrap a matrix with vectrix methods", function() {
 		// checks that methods exist and seem to work
+		let mat2 = matrices.create(2,2,[2,2,2,2]);
 		function checkMethods(mat) {
 			mat.toArray.should.be.a.Function();
 			mat.toArray().should.eql([-5,2,1,4]);
@@ -211,11 +214,17 @@ describe("an arbitrary matrix", function() {
 			mat.row.should.be.a.Function();
 			toArray(mat.row(0)).should.eql([-5,2]);
 			mat.plus.should.be.a.Function();
-			toArray(mat.plus(3)).should.eql([-2,5,4,7]);
+			toArray(mat.plus(mat2)).should.eql([-3,4,3,6]);
+			mat.plus_scalar.should.be.a.Function();
+			toArray(mat.plus_scalar(3)).should.eql([-2,5,4,7]);
 			mat.minus.should.be.a.Function();
-			toArray(mat.minus(3)).should.eql([-8,-1,-2,1]);
+			toArray(mat.minus(mat2)).should.eql([-7,0,-1,2]);
+			mat.minus_scalar.should.be.a.Function();
+			toArray(mat.minus_scalar(3)).should.eql([-8,-1,-2,1]);
 			mat.dot.should.be.a.Function();
 			toArray(mat.dot(mat)).should.eql([27,-2,-1,18]);
+			mat.multiply_scalar.should.be.a.Function();
+			toArray(mat.multiply_scalar(0)).should.eql([0,0,0,0]);
 		}
 		let mat = matrices.create(2,2,[-5,2,1,4]);
 		matrices.wrap(mat);

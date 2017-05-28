@@ -65,7 +65,7 @@ first.col(1); // matrix(1,2,[2,4])
 
 "use strict";
 // set the max size for certain matrix operations, used in creating scratch memory
-const ROW_MAX = 20, COL_MAX = 20;
+//const MBF = 20;
 const {cos, sin} = Math;
 
 /**
@@ -98,23 +98,17 @@ export function flatten(a) {
  * @return {matrix}
  */
 export const plus = (function() {
-	let i = 0|0, len = 0|0;
+	let i = 0|0, l = 0|0, ar = 0|0, ac = 0|0;
 	return function plus(a, b, out) {
-		if(typeof(b) === "number") {
-			out = out||create(a.rows, a.cols);
-			for(i = 0, len = a.length; i < len; ++i) {
-				out[i] = a[i] + b;
-			}
-			return out;
+		if((ar = a.rows) !==  b.rows || ((ac = a.cols) != b.cols)) return undefined;
+		l = a.length;//-1;
+		ar = a.rows;
+		ac = a.cols;
+		out = out||create(a.rows, a.cols);
+		for(i = 0|0; i < l; ++i) {
+			out[i] = a[i] + b[i]
 		}
-		else if ((a.cols === b.cols) && (a.rows === b.rows)) { 
-			out = out||create(a.rows, a.cols);
-			for(i = 0, len = a.length; i < len; ++i) {
-				out[i] = a[i] + b[i]
-			}
-			return out;
-		}
-		else return undefined;
+		return out;
 	}
 })();
 
@@ -132,6 +126,40 @@ export function mut_plus(a, b) {
 }
 
 /**
+ * Add a scalar to a matrix.
+ * plus_scalar(matrix, anotherMatrix); // function
+ * matrix.plus_scalar(anotherMatrix); // method
+ * @function plus
+ * @param {matrix} a first matrix
+ * @param {matrix} s scalar
+ * @param {matrix} out (optional) out value
+ * @return {matrix}
+ */
+export const plus_scalar = (function() {
+	let i = 0|0;
+	return function plus_scalar(a, s, out) {
+		out = out||create(a.rows, a.cols);
+		s = +s;
+		i = a.length;//-1;
+		while(i--) {
+			out[i] = a[i] + s;
+		}
+		return out;
+	}
+})();
+
+/**
+ * Mutating version of [plus](#plus).
+ * @function mut_plus
+ * @param {matrix} a first matrix
+ * @param {matrix} s second matrix
+ * @return {matrix}
+ */
+export function mut_plus_scalar(a, s) {
+	return plus_scalar(a, s, a);
+}
+
+/**
  * Subtract matrices.
  * @example
  * minus(matrix, anotherMatrix); // function
@@ -141,23 +169,17 @@ export function mut_plus(a, b) {
  * @return {matrix}
  */
 export const minus = (function() {
-	let i = 0|0, len = 0|0;
+	let i = 0|0, ac = 0|0, ar = 0|0;
 	return function minus(a, b, out) {
-		if(typeof(b) === "number") {
-			out = out||create(a.rows, a.cols);
-			for(i = 0, len = a.length; i < len; ++i) {
-				out[i] = a[i] - b;
-			}
-			return out;
+		if((ar = a.rows) !==  b.rows || ((ac = a.cols) != b.cols)) return undefined;
+		i = a.length;//-1;
+		ar = a.rows;
+		ac = a.cols;
+		out = out||create(ar, ac);
+		while(i--) {
+			out[i] = a[i] - b[i]
 		}
-		else if((a.cols === b.cols) && (a.rows === b.rows)) { 
-			out = out||create(a.rows, a.cols);
-			for(i = 0, len = a.length; i < len; ++i) {
-				out[i] = a[i] - b[i]
-			}
-			return out;
-		}
-		else return undefined;
+		return out;
 	}
 })();
 
@@ -172,6 +194,40 @@ export const minus = (function() {
  */
 export function mut_minus(a, b) {
 	return minus(a, b, a);
+}
+
+/**
+ * subtract a scalar to a matrix.
+ * minus_scalar(matrix, anotherMatrix); // function
+ * matrix.minus_scalar(anotherMatrix); // method
+ * @function minus
+ * @param {matrix} a first matrix
+ * @param {matrix} s scalar
+ * @param {matrix} out (optional) out value
+ * @return {matrix}
+ */
+export const minus_scalar = (function() {
+	let i = 0|0;
+	return function minus_scalar(a, s, out) {
+		out = out||create(a.rows, a.cols);
+		s = +s;
+		i = a.length;//-1;
+		while(i--) {
+			out[i] = a[i] - s;
+		}
+		return out;
+	}
+})();
+
+/**
+ * Mutating version of [minus](#minus).
+ * @function mut_minus
+ * @param {matrix} a first matrix
+ * @param {matrix} s second matrix
+ * @return {matrix}
+ */
+export function mut_minus_scalar(a, s) {
+	return minus_scalar(a, s, a);
 }
 
 /**
@@ -218,8 +274,23 @@ export const row = (function() {
 	}
 })();
 
+export const multiply_scalar = (function() {
+	let i = 0|0, len = 0|0;
+	return function multiply_scalar(a, s, out) {
+		out = out||create(a.rows, a.cols);
+		for(i = 0, len = a.length; i < len; ++i) {
+			out[i] = a[i] * s;
+		}
+		return out;
+	}
+})();
+
+export function mut_multiply_scalar(a, s) {
+	return multiply_scalar(a, s, a);
+}
+
 /**
- * Multiply matrices. Supports up to ROW_MAX x COL_MAX matrices for now.
+ * Multiply matrices or vectors.
  * @example
  * dot(matrix, anotherMatrix); // function 
  * matrix.dot(anotherMatrix); // method
@@ -229,37 +300,30 @@ export const row = (function() {
  * @return {matrix}
  */
 export const dot = (function() {
-	let rowscratch = new Float32Array(ROW_MAX), 
-		  colscratch = new Float32Array(COL_MAX);
-	let i = 0|0, len = 0|0, j = 0|0, jl = 0|0, k = 0|0, kl = 0|0, 
-	    m = 0|0, ml = 0|0, sum = 0.0;
+	let blen = 0|0, brow = 0|0, bcol = 0|0, bcols = 0|0, brows = 0|0, bpos = 0|0;
+	let acols = 0|0, arows = 0|0, arow = 0|0, aroff = 0|0, apos = 0|0;
+	let opos = 0|0;
 	return function dot(a, b, out) {
-		if(typeof(b) === "number") {
-			out = out||create(a.rows, a.cols);
-			for(i = 0, len = a.length; i < len; ++i) {
-				out[i] = a[i] * b;
-			}
-			return out;
-		}
-		else if(a.cols === b.rows) {
-			jl = a.rows;
-			kl = b.cols;
-			ml = b.rows;
-			out = out||create(jl, kl);
-			for(j = 0; j < jl; ++j) { // row loop
-				row(a, j, rowscratch);
-				for(k = 0; k < kl; ++k) { // column loop
-					col(b, k, colscratch);
-					sum = 0.0;
-					for(m = 0; m < ml; ++m) { // sum loop
-						sum = sum + rowscratch[m]*colscratch[m];
-					}
-					out[(j * kl) + k] = sum;
+		if((acols = a.cols) !== (brows = b.rows)) return undefined;
+		else {
+			arows = a.rows;
+			bcols = b.cols;
+			blen = b.length;
+			out = out||create(arows, bcols);
+			out.fill(0.0);
+			opos = 0;
+			for(arow = 0; arow < arows; ++arow) { 
+				aroff = arow * acols;
+				for(bpos = 0|0; bpos < blen; ++bpos) {
+					bcol = bpos % bcols;
+					brow = (bpos / bcols)|0; // bitwise floor is safe here and faster
+					opos = (bcols * arow) + bcol;
+					apos = (aroff + brow);
+					out[opos] = out[opos] + b[bpos] * a[apos];
 				}
 			}
 			return out;
 		}
-		else return undefined;
 	}
 })();
 
@@ -359,8 +423,15 @@ export function wrap(matrix, rows, cols) {
 	matrix.col = col.bind(null, matrix);
 	matrix.row = row.bind(null, matrix);
 	matrix.plus = plus.bind(null, matrix);
+	matrix.plus_scalar = plus_scalar.bind(null, matrix);
 	matrix.minus = minus.bind(null, matrix);
+	matrix.minus_scalar = minus_scalar.bind(null, matrix);
 	matrix.dot = dot.bind(null, matrix);
+	matrix.multiply_scalar = multiply_scalar.bind(null, matrix);
+	matrix.mut_plus = mut_plus.bind(null, matrix);
+	matrix.mut_plus_scalar = mut_plus_scalar.bind(null, matrix);
+	matrix.mut_minus = mut_minus.bind(null, matrix);
+	matrix.mut_minus_scalar = mut_minus_scalar.bind(null, matrix);
 	return matrix;
 }
 

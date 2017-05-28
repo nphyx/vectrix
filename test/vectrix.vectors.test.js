@@ -538,11 +538,17 @@ describe("a wrapped 2d vector", function() {
 			vec.row.should.be.a.Function();
 			toArray(vec.row(1)).should.eql([2]);
 			vec.plus.should.be.a.Function();
-			toArray(vec.plus(3)).should.eql([-2,5]);
+			vec.plus(vec).should.eql(matrices.plus(vec, vec));
+			vec.plus_scalar.should.be.a.Function();
+			vec.plus_scalar(3).should.eql(matrices.plus_scalar(vec, 3));
 			vec.minus.should.be.a.Function();
-			toArray(vec.minus(3)).should.eql([-8,-1]);
+			vec.minus(vec).should.eql(matrices.minus(vec, vec));
+			vec.minus_scalar.should.be.a.Function();
+			vec.minus_scalar(3).should.eql(matrices.minus_scalar(vec, 3));
 			vec.dot.should.be.a.Function();
 			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.multiply_scalar.should.be.a.Function();
+			vec.multiply_scalar(3).should.eql(matrices.multiply_scalar(vec, 3));
 			vec.cross.should.be.a.Function();
 			toArray(vec.cross(Float32Array.of(-3,7))).should.eql(
 				toArray(vectors.cross(vec, Float32Array.of(-3,7)))
@@ -637,11 +643,17 @@ describe("a wrapped 3d vector", function() {
 			vec.row.should.be.a.Function();
 			toArray(vec.row(2)).should.eql([1]);
 			vec.plus.should.be.a.Function();
-			toArray(vec.plus(3)).should.eql([-2,5,4]);
+			vec.plus(vec).should.eql(matrices.plus(vec, vec));
+			vec.plus_scalar.should.be.a.Function();
+			vec.plus_scalar(3).should.eql(matrices.plus_scalar(vec, 3));
 			vec.minus.should.be.a.Function();
-			toArray(vec.minus(3)).should.eql([-8,-1,-2]);
+			vec.minus(vec).should.eql(matrices.minus(vec, vec));
+			vec.minus_scalar.should.be.a.Function();
+			vec.minus_scalar(3).should.eql(matrices.minus_scalar(vec, 3));
 			vec.dot.should.be.a.Function();
 			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.multiply_scalar.should.be.a.Function();
+			vec.multiply_scalar(3).should.eql(matrices.multiply_scalar(vec, 3));
 			vec.cross.should.be.a.Function();
 			toArray(vec.cross(Float32Array.of(-3,7,3))).should.eql(
 				toArray(vectors.cross(vec, Float32Array.of(-3,7,3)))
@@ -735,11 +747,17 @@ describe("a wrapped 4d vector", function() {
 			vec.row.should.be.a.Function();
 			toArray(vec.row(2)).should.eql([1]);
 			vec.plus.should.be.a.Function();
-			toArray(vec.plus(3)).should.eql([-2,5,4,10]);
+			vec.plus(vec).should.eql(matrices.plus(vec, vec));
+			vec.plus_scalar.should.be.a.Function();
+			vec.plus_scalar(3).should.eql(matrices.plus_scalar(vec, 3));
 			vec.minus.should.be.a.Function();
-			toArray(vec.minus(3)).should.eql([-8,-1,-2,4]);
+			vec.minus(vec).should.eql(matrices.minus(vec, vec));
+			vec.minus_scalar.should.be.a.Function();
+			vec.minus_scalar(3).should.eql(matrices.minus_scalar(vec, 3));
 			vec.dot.should.be.a.Function();
 			mat.dot(vec).should.eql(matrices.dot(mat, vec));
+			vec.multiply_scalar.should.be.a.Function();
+			vec.multiply_scalar(3).should.eql(matrices.multiply_scalar(vec, 3));
 			vec.homogenous.should.be.a.Function();
 			toArray(vec.homogenous()).should.eql([-5,2,1,7,1]);
 			vec.times.should.be.a.Function();

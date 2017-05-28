@@ -464,6 +464,19 @@ export function mut_cubic(a, b, c, d, t) {
 	return cubic(a, b, c, d, t, a);
 }
 
+
+export const dot = (function() {
+	let i = 0|0, sum = 0.0;
+	return function dot(a, b) {
+		sum = 0.0;
+		i = a.length;
+		while(i--) {
+			sum = sum + a[i] * b[i];
+		}
+		return sum;
+	}
+})();
+
 /**
  * Vector product for matching vector types. Accepts vectors or generic arrays, 
  * or defaults up to the matrix product if the vectors don't match (which supports
@@ -475,28 +488,23 @@ export function mut_cubic(a, b, c, d, t) {
  * @return {matrix|float} product of a and b 
  */
 export var times = (function() {
-	let i = 0|0, len = 0|0, scratch = new Float32Array(4), sum = 0.0;
+	let i = 0|0;//, len = 0|0;
 	return function(a, b, out) {
-		out = out||new Float32Array(a.length);
+		i = a.length-1;
 		if(typeof b === "number") {
-			for(i = 0, len = a.length; i < len; ++i) {
+			out = out||new Float32Array(i+1);
+			for(;i >= 0; --i) {
 				out[i] = a[i] * b;
 			}
 			return out;
 		}
-		else {
-			len = a.length;
-			for(i = 0; i < len; ++i) {
-				scratch[i] = a[i] * b[i];
-			}
-			sum = 0.0;
-			for(i = 0; i < len; ++i) {
-				sum += scratch[i];
-			}
-			return (out = sum);
-		}
+		else return dot(a, b);
 	}
 })();
+
+times.vec2 = function vec2times(a, b) {
+	return a[0] * b[0] + a[1] * b[1];
+}
 
 /**
  * Mutating version of [times](#times). Note that a is mutated only when a is a vector
@@ -707,6 +715,7 @@ export function wrap(vec) {
 	vec.times = asMethod(times, vec);
 	vec.lerp = asMethod(lerp, vec);
 	vec.cubic = asMethod(cubic, vec);
+	vec.dot = asMethod(dot, vec);
 	vec.clamp = asMethod(clamp, vec);
 	vec.angle = angle.bind(null, vec);
 	vec.magnitude = magnitude.bind(null, vec);
