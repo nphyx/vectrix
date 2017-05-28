@@ -195,6 +195,20 @@ describe("an arbitrary matrix", function() {
 		let out = matrices.create(3,2);
 		multiply_scalar(mat4,3,out).should.equal(out);
 	});
+	it("should not mutate its operands during a scalar multiply", function() {
+		let multiply_scalar = matrices.multiply_scalar;
+		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);
+		let out = matrices.create(3,2);
+		multiply_scalar(mat4, 3, out);
+		toArray(out).should.eql([-6,6, 0,-6, -18,9]);
+		toArray(mat4).should.eql([-2,2, 0,-2, -6,3]);
+	});
+	it("should mutate its first operand during a mutating scalar multiply", function() {
+		let mut_multiply_scalar = matrices.mut_multiply_scalar;
+		let mat4 = matrices.create(3,2,[-2,2, 0,-2, -6,3]);
+		toArray(mut_multiply_scalar(mat4,3)).should.eql([-6,6, 0,-6, -18,9]);
+		toArray(mat4).should.eql([-6,6, 0,-6, -18,9]);
+	});
 	it("should reject incompatible matrices", function() {
 		let dot = matrices.dot;
 		let mat1 = matrices.create(1,3);
