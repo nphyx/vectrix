@@ -61,13 +61,13 @@ xy; // vec2(0,1)
 ```
 
 ... except when you ask it to:
-```
+```javascript
 vectors.mut_plus(xy, [7,3]);
 xy; // vec2(7,4)
 ```
 
 ... and it supports optional out parameters if you need to save on memory and garbage collection:
-```
+```javascript
 let out = vectors.create.vec2();
 vectors.plus(xy, [7,3], out); // vec2(7,4)
 out; // vec2(7,4)
