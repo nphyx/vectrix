@@ -1,6 +1,6 @@
 {
   "name": "@nphyx/vectrix",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "repository": "https://github.com/nphyx/vectrix",
   "description": "A functional/OO matrix math library for javascript",
   "author": "Justen Robertson <nphyxx@gmail.com>",
