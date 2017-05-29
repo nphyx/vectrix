@@ -52,8 +52,9 @@ vectors.dot(xy, [6,3]); // 3
 vectors.lerp(xy, [4,5], 0.3); // vec2(1.2000000476837158, 2.200000047683716)
 // multiply a vector by a rotation matrix to rotate it
 vectors.dot(rotX, xyz); // vec3(-3.6859018802642822,-3.3784799575805664,11)
+```
 
-It doesn't mute its operands:
+It doesn't mutate its operands:
 ```javascript
 vectors.plus(xy, [7,3]); // vec2(7,4)
 xy; // vec2(0,1)
@@ -88,6 +89,7 @@ xy.yx; // vec2(1,0);
 When performance really matters, use the functional style with out parameters. When you need it to be easier to reason about and manipulate, the object oriented wrappers are helpful.
 
 [See the wiki for complete documentation](https://github.com/nphyx/vectrix/wiki)*
+
 _*currently out of date, sorry_
 
 Install
