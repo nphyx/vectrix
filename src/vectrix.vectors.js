@@ -346,6 +346,27 @@ export const homogenous = (function() {
 })();
 
 /**
+ * Calculate the magnitude of a vector.
+ * @example
+ * magnitude(vec3(2,3,6)); // ~6.16
+ *
+ * @function magnitude
+ * @param {vector} a operand
+ * @return {float} magnitude of a
+ */
+export const magnitude = (function() {
+	let scratch = 0.0, cur = 0.0, i = 0|0, len = 0|0;
+	return function magnitude(a) {
+		scratch = 0.0;
+		for(i = 0, len = a.length; i < len; ++i) {
+			cur = a[i];
+			scratch = scratch + cur * cur;	
+		}
+		return sqrt(scratch);
+	}
+})();
+
+/**
  * Normalize a vector.
  *
  * @example
@@ -358,17 +379,19 @@ export const homogenous = (function() {
  * @return {vector}
  */
 export const normalize = (function() {
-	let sum = 0.0, cur = 0.0, i = 0|0, len = 0|0;
+	let scale = 0.0, i = 0|0, len = 0|0;
 	return function normalize(a, out = undefined) {
 		len = a.length;
-		sum = 0.0;
 		out = out||create(len);
+		scale = 1/magnitude(a);
+		/*
 		for(i = 0|0; i < len; ++i) {
 			cur = a[i]; // cut out one reference
-			sum += cur*cur;
+			sum = sum+cur*cur;
 		}
-		for(i = 0|0; i < len; ++i) {
-			out[i] = a[i]/sqrt(sum);
+		*/
+		for(i = 0; i < len; ++i) {
+			out[i] = a[i]*scale;
 		}
 		return out;
 	}
@@ -615,26 +638,6 @@ export var clamp = (() => {
 export function mut_clamp(a, min, max) {
 	return clamp(a, min, max, a);
 }
-
-/**
- * Calculate the magnitude of a vector.
- * @example
- * magnitude(vec3(2,3,6)); // ~6.16
- *
- * @function magnitude
- * @param {vector} a operand
- * @return {float} magnitude of a
- */
-export const magnitude = (function() {
-	let scratch = 0.0, i = 0|0, len = 0|0;
-	return function magnitude(a) {
-		scratch = 0.0;
-		for(i = 0, len = a.length; i < len; ++i) {
-			scratch = scratch + a[i] * a[i];	
-		}
-		return sqrt(scratch);
-	}
-})();
 
 /**
  * Get a string representation of a vector.
