@@ -123,6 +123,7 @@ are available. vec2s only support x/y because r/g is not useful.
 */
 "use strict";
 import * as matrices from "./vectrix.matrices";
+let flatten = matrices.flatten;
 let {sqrt, min, max, acos} = Math;
 
 /*
@@ -587,16 +588,25 @@ export const distance = (function() {
  * @return {Float32Array(3)} cross product
  */
 export const cross = (function() {
-	let scratcha = new Float32Array(3);
-	let scratchb = new Float32Array(3);
+	let a0 = 0.0; let a1 = 0.0; let a2 = 0.0;
+	let b0 = 0.0; let b1 = 0.0; let b2 = 0.0;
 	return function cross(a, b, out) {
 		if(a.length > 3 || b.length > 3 || a.length < 2 || b.length < 2) return undefined;
 		out = out||create(3);
-		mut_copy(scratcha.fill(0), a);
-		mut_copy(scratchb.fill(0), b);
+		a0 = a[0]; a1 = a[1]; a2 = a[2]||0.0;
+		b0 = b[0]; b1 = b[1]; b2 = b[2]||0.0;
+		out[0] = a1*b2 - a2*b1;
+		out[1] = a2*b0 - a0*b2;
+		out[2] = a0*b1 - a1*b0;
+		/*
+		mut_copy(scratcha, a);
+		mut_copy(scratchb, b);
+		if(a.length === 2) scratcha[2] = 0;
+		if(b.length === 2) scratchb[2] = 0;
 		out[0] = scratcha[1]*scratchb[2] - scratcha[2]*scratchb[1];
 		out[1] = scratcha[2]*scratchb[0] - scratcha[0]*scratchb[2];
 		out[2] = scratcha[0]*scratchb[1] - scratcha[1]*scratchb[0];
+		*/
 		return out;
 	}
 })();
@@ -673,30 +683,26 @@ export function toString(a) {
  * @return {vector}
  */
 export function create() {
-	if(arguments.length === 0) throw new Error("vectors.create requires at least one argument");
-	let params = Array.prototype.slice.apply(arguments), len = params.length, buffer, vec, offset = 0;
-	if(len === 1) { // just create an empty array of length params[0]
-		vec = matrices.create(params[0],1);
-		vec.fill(0);
+	var len = arguments.length, vec;
+	if(len === 0) throw new Error("vectors.create requires at least one argument");
+	else if(len === 1) {
+		vec = new Float32Array(arguments[0]);
 	}
 	else {
-		if(params[len-1] instanceof ArrayBuffer) { // supplied buffer, no offset
-			buffer = params[len-1];
+		let params = Array.prototype.slice.apply(arguments), buffer, offset = 0, size = params.shift(), len = params.length;
+		if((len > 0) && params[len-1] instanceof ArrayBuffer) { // supplied buffer, no offset
 			offset = 0;
-			params = params.slice(0, len-1);
+			buffer = params.pop();
 		}
-		else if(params[len-2] instanceof ArrayBuffer) { // supplied buffer + offset
-			buffer = params[len-2];
-			offset = params[len-1];
-			params = params.slice(0, len-2);
+		else if((len > 1) && params[len-2] instanceof ArrayBuffer) { // supplied buffer + offset
+			offset = params.pop();
+			buffer = params.pop();
 		}
-		if(params.length === 1) {
-			vec = matrices.create(params[0], 1, undefined, buffer, offset);
-			vec.fill(0);
+		if(buffer !== undefined) {
+			vec = new Float32Array(buffer, offset, size);
 		}
-		else {
-			vec = matrices.create(params[0], 1, params.slice(1), buffer, offset);
-		}
+		else vec = new Float32Array(size);
+		if(params.length > 0) vec.set(flatten(params));
 	}
 	return vec;
 }
@@ -736,27 +742,16 @@ export function wrap(vec) {
  * @function create.vec2
  * @return {vector}
  */
-export const vec2 = create.vec2 = function() {
-	let vec = create.apply(null, [2].concat(Array.prototype.slice.apply(arguments)));
-	return vec;
-}
-
+export const vec2 = create.vec2 = create.bind(null, 2);
 /** 
  * Creates a 3d vector. Curried version of [create](#create) with first argument presupplied.
  * @function create.vec3
  * @return {vector}
  */
-export const vec3 = create.vec3 = function() {
-	let vec = create.apply(null, [3].concat(Array.prototype.slice.apply(arguments)));
-	return vec;
-}
-
+export const vec3 = create.vec3 = create.bind(null, 3);
 /** 
  * Creates a 4d vector. Curried version of [create](#create) with first argument presupplied.
  * @function create.vec4
  * @return {vector}
  */
-export const vec4 = create.vec4 = function() {
-	let vec = create.apply(null, [4].concat(Array.prototype.slice.apply(arguments)));
-	return vec;
-}
+export const vec4 = create.vec4 = create.bind(null, 4);

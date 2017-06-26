@@ -304,10 +304,11 @@ export const dot = (function() {
 	let acols = 0|0, arows = 0|0, arow = 0|0, aroff = 0|0, apos = 0|0;
 	let opos = 0|0;
 	return function dot(a, b, out) {
-		if((acols = a.cols) !== (brows = b.rows)) return undefined;
-		else {
-			arows = a.rows;
-			bcols = b.cols;
+		acols = (a.cols !== undefined)?a.cols:a.length;
+		brows = (b.rows !== undefined)?b.rows:b.length;
+		if(acols === brows) {
+			arows = (a.rows !== undefined)?a.rows:1;
+			bcols = (b.cols !== undefined)?b.cols:1;
 			blen = b.length;
 			out = out||create(arows, bcols);
 			out.fill(0.0);
@@ -324,6 +325,7 @@ export const dot = (function() {
 			}
 			return out;
 		}
+		else return undefined;
 	}
 })();
 

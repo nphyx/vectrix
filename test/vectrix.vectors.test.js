@@ -251,8 +251,6 @@ describe("a 2d vector", function() {
 	it("should create a vector [0,0] when given no arguments", function() {
 		let vec = vectors.vec2();
 		toArray(vec).should.eql([0,0]);
-		vec.rows.should.eql(2);
-		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 2", function() {
 		let initial = [1,2];
@@ -312,6 +310,7 @@ describe("a 2d vector", function() {
 		let vec = vectors.vec2(7,4);
 		let matrix = matrices.create(2,2,[1,0, 0,1]);
 		toArray(matrices.dot(matrix, vec)).should.eql([7,4]);
+		toArray(matrices.dot(vec, matrix)).should.eql([7,4]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec2(7,4);
@@ -328,8 +327,6 @@ describe("a 3d vector", function() {
 	it("should create a vector [0,0,0] when given no arguments", function() {
 		let vec = vectors.vec3();
 		toArray(vec).should.eql([0,0,0]);
-		vec.rows.should.eql(3);
-		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 3", function() {
 		let initial = [1,2,3];
@@ -373,6 +370,7 @@ describe("a 3d vector", function() {
 		let vec = vectors.vec3(7,4,13);
 		let matrix = matrices.create(3,3,[1,0,0, 0,1,0, 0,0,1]);
 		toArray(matrices.dot(matrix, vec)).should.eql([7,4,13]);
+		toArray(matrices.dot(vec, matrix)).should.eql([7,4,13]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec3(7,4,5);
@@ -389,8 +387,6 @@ describe("a 4d vector", function() {
 	it("should create a vector [0,0,0,0] when given no arguments", function() {
 		let vec = vectors.vec4();
 		toArray(vec).should.eql([0,0,0,0]);
-		vec.rows.should.eql(4);
-		vec.cols.should.eql(1);
 	});
 	it("should create a populated vector when given one argument with length 4", function() {
 		let initial = [1,2,3,4];
@@ -438,6 +434,7 @@ describe("a 4d vector", function() {
 		let vec = vectors.vec4(7,4,13,-2);
 		let matrix = matrices.create(4,4,[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
 		toArray(matrices.dot(matrix, vec)).should.eql([7,4,13,-2]);
+		toArray(matrices.dot(vec, matrix)).should.eql([7,4,13,-2]);
 	});
 	it("should be scaled by a scaling matrix", function() {
 		let vec = vectors.vec4(7,4,5,-2);

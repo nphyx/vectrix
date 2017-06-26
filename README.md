@@ -1,4 +1,4 @@
-Vectrix 0.2.0
+Vectrix 0.2.1
 =============
 Vectrix is a matrix math library for javascript aimed at allowing the developer
 to make conscious tradeoffs between performance, flexibility, and expressiveness. 
